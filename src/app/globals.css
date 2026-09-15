@@ -1,0 +1,246 @@
+@import 'tailwindcss';
+
+/*
+ * Eisman Holdings Command Center — design tokens.
+ *
+ * Light: warm cream surfaces, deep emerald navigation, gold accents.
+ * Dark:  near-black charcoal surfaces, the same emerald/gold accents.
+ * Deliberately no dominant blue: blue appears only as an informational status.
+ */
+@theme {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Inter, Roboto, 'Helvetica Neue', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --color-emerald-950: #06281a;
+  --color-emerald-900: #0a3a26;
+  --color-emerald-800: #0f5132;
+  --color-emerald-700: #14663f;
+  --color-emerald-600: #1a7f4e;
+  --color-emerald-500: #22a165;
+  --color-emerald-400: #3fbd82;
+  --color-emerald-300: #74d4a5;
+  --color-emerald-200: #a9e5c6;
+  --color-emerald-100: #d6f2e3;
+  --color-emerald-50: #eefaf3;
+
+  --color-gold-900: #6b5417;
+  --color-gold-800: #8c6f1f;
+  --color-gold-700: #ab8a2b;
+  --color-gold-600: #c8a951;
+  --color-gold-500: #d8bd72;
+  --color-gold-400: #e5d09a;
+  --color-gold-300: #eee0bd;
+  --color-gold-200: #f5ecd8;
+  --color-gold-100: #faf5e9;
+
+  --color-cream-50: #fdfcf9;
+  --color-cream-100: #faf8f3;
+  --color-cream-200: #f2efe7;
+  --color-cream-300: #e7e2d6;
+
+  --color-charcoal-950: #0c0e0d;
+  --color-charcoal-900: #131614;
+  --color-charcoal-850: #191d1b;
+  --color-charcoal-800: #202524;
+  --color-charcoal-700: #2c3331;
+  --color-charcoal-600: #3d4644;
+  --color-charcoal-500: #5a6360;
+
+  --radius-card: 0.875rem;
+}
+
+:root {
+  --bg: var(--color-cream-100);
+  --bg-subtle: var(--color-cream-200);
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: var(--color-cream-200);
+  --border: #e3ded2;
+  --border-strong: #cfc8b7;
+  --fg: #1a1f1d;
+  --fg-muted: #5f6b66;
+  --fg-subtle: #87918c;
+  --accent: var(--color-emerald-800);
+  --accent-fg: #ffffff;
+  --accent-soft: var(--color-emerald-50);
+  --accent-soft-fg: var(--color-emerald-800);
+  --gold: var(--color-gold-700);
+  --gold-soft: var(--color-gold-100);
+  --nav-bg: var(--color-emerald-950);
+  --nav-fg: #d9e6df;
+  --nav-fg-muted: #8fa89c;
+  --nav-active-bg: rgba(255, 255, 255, 0.09);
+  --nav-active-fg: #ffffff;
+  --ring: var(--color-emerald-600);
+  --shadow-card: 0 1px 2px rgba(20, 30, 25, 0.04), 0 8px 24px -12px rgba(20, 30, 25, 0.12);
+
+  --success: #17734a;
+  --success-bg: #e7f6ee;
+  --warning: #8a5a10;
+  --warning-bg: #fdf1dd;
+  --danger: #a32a26;
+  --danger-bg: #fbeae9;
+  --info: #2c5f73;
+  --info-bg: #e6f1f5;
+  --neutral: #5f6b66;
+  --neutral-bg: #f0ede5;
+
+  color-scheme: light;
+}
+
+.dark {
+  --bg: var(--color-charcoal-950);
+  --bg-subtle: var(--color-charcoal-900);
+  --surface: var(--color-charcoal-900);
+  --surface-raised: var(--color-charcoal-850);
+  --surface-sunken: var(--color-charcoal-800);
+  --border: #262d2a;
+  --border-strong: #38403d;
+  --fg: #eceee d;
+  --fg: #ecefed;
+  --fg-muted: #9aa6a1;
+  --fg-subtle: #6f7a76;
+  --accent: var(--color-emerald-500);
+  --accent-fg: #04150d;
+  --accent-soft: rgba(34, 161, 101, 0.14);
+  --accent-soft-fg: var(--color-emerald-300);
+  --gold: var(--color-gold-500);
+  --gold-soft: rgba(200, 169, 81, 0.14);
+  --nav-bg: #080b0a;
+  --nav-fg: #c6d3cd;
+  --nav-fg-muted: #7f8c87;
+  --nav-active-bg: rgba(255, 255, 255, 0.08);
+  --nav-active-fg: #ffffff;
+  --ring: var(--color-emerald-400);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.5), 0 10px 28px -14px rgba(0, 0, 0, 0.7);
+
+  --success: #5fd39a;
+  --success-bg: rgba(34, 161, 101, 0.16);
+  --warning: #e0b464;
+  --warning-bg: rgba(200, 169, 81, 0.16);
+  --danger: #f28b86;
+  --danger-bg: rgba(200, 70, 62, 0.18);
+  --info: #86c0d4;
+  --info-bg: rgba(90, 150, 175, 0.16);
+  --neutral: #9aa6a1;
+  --neutral-bg: rgba(255, 255, 255, 0.06);
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-border-base: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-fg: var(--accent-soft-fg);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-nav: var(--nav-bg);
+  --color-nav-fg: var(--nav-fg);
+  --color-nav-fg-muted: var(--nav-fg-muted);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+  --color-neutral: var(--neutral);
+  --color-neutral-bg: var(--neutral-bg);
+  --color-ring: var(--ring);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  /* Tabular figures everywhere numbers are compared vertically. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--accent-soft-fg);
+  }
+  /* Slim, unobtrusive scrollbars that respect the theme. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+}
+
+@layer utilities {
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--surface-sunken) 25%,
+      var(--bg-subtle) 37%,
+      var(--surface-sunken) 63%
+    );
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease infinite;
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0 50%;
+    }
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+}
+
+@media print {
+  .print-hide {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+  .print-break {
+    break-inside: avoid;
+  }
+}
