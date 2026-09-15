@@ -93,7 +93,7 @@ export function IntegrationCard({
   };
 
   return (
-    <Card className={cn('flex flex-col', planned && 'opacity-80')}>
+    <Card id={provider.id} className={cn('flex scroll-mt-24 flex-col', planned && 'opacity-80')}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">

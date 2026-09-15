@@ -76,7 +76,9 @@ export function encryptSecret(plaintext: string): string {
 
 export function decryptSecret(payload: string): string {
   const [version, ivB64, tagB64, ctB64] = payload.split('.');
-  if (version !== 'v1' || !ivB64 || !tagB64 || !ctB64) {
+  // An empty ciphertext is legitimate (an empty secret), so test for a missing
+  // segment rather than a falsy one.
+  if (version !== 'v1' || !ivB64 || !tagB64 || ctB64 === undefined) {
     throw new Error('Malformed encrypted payload.');
   }
   const decipher = createDecipheriv(

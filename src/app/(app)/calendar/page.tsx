@@ -100,7 +100,7 @@ export default async function CalendarPage({
                 external events, attendees and conference links.
               </p>
               <Button asChild variant="secondary" size="sm">
-                <Link href="/integrations/google_calendar">Calendar integration</Link>
+                <Link href="/integrations#google_calendar">Calendar integration</Link>
               </Button>
             </CardContent>
           </Card>

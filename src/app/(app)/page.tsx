@@ -15,7 +15,7 @@ import { listActivity } from '@/lib/activity';
 import { sql } from '@/lib/db/client';
 import { formatCurrency, formatNumber, formatPercent, pctChange, cn } from '@/lib/utils';
 import { PageHeader, SectionHeading, SourceNote } from '@/components/ui/page';
-import { StatCard } from '@/components/ui/stat-card';
+import { StatCard, MiniStatStrip } from '@/components/ui/stat-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { StatusBadge, HealthBadge } from '@/components/ui/status';
@@ -103,10 +103,14 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         actions={<DashboardFilters preset={range.preset} scopeSlug={scope.slug} companies={actor.companies} />}
       />
 
-      {canSeeFinance ? (
-        <section className="mb-6" aria-label="Financial summary">
-          <SectionHeading title="Money" />
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      {/*
+        Four headline numbers, then everything else in one quiet strip. The
+        supporting figures are all still here and still link to their records —
+        they simply do not compete with the headlines for attention.
+      */}
+      <section className="mb-6" aria-label="At a glance">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {canSeeFinance ? (
             <StatCard
               label="Revenue"
               value={formatCurrency(metrics.revenue.current)}
@@ -115,122 +119,119 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
               href={q('/finances?tab=payments')}
               hint="Succeeded inbound payments in the selected period."
             />
+          ) : null}
+          {canSeeFinance ? (
             <StatCard
               label="Recurring revenue"
               value={formatCurrency(metrics.recurringRevenue)}
               hint="Monthly value of active subscriptions and retainers."
               href={q('/finances?tab=subscriptions')}
             />
-            <StatCard
-              label="Accounts receivable"
-              value={formatCurrency(metrics.accountsReceivable)}
-              hint={
-                metrics.overdueReceivable > 0
-                  ? `${formatCurrency(metrics.overdueReceivable)} of it is overdue`
-                  : 'Nothing overdue'
-              }
-              tone={metrics.overdueReceivable > 0 ? 'warning' : 'default'}
-              href={q('/finances?tab=invoices&status=open')}
-            />
-            <StatCard
-              label="Upcoming payments"
-              value={formatCurrency(metrics.upcomingPayments)}
-              hint="Contractor invoices submitted or approved, not yet paid."
-              href={q('/team?tab=invoices')}
-            />
-            <StatCard
-              label="Net cash flow"
-              value={formatCurrency(metrics.netCashFlow.current)}
-              delta={pctChange(metrics.netCashFlow.current, metrics.netCashFlow.previous)}
-              comparisonLabel={cmp}
-              tone={metrics.netCashFlow.current < 0 ? 'danger' : 'default'}
-              href={q('/finances')}
-              hint="Revenue less recorded expenses. Not an accounting statement."
-            />
-          </div>
-          <SourceNote
-            className="mt-2"
-            source="Payments, invoices, subscriptions and expenses in this system (connected, imported and manually entered)"
-          />
-        </section>
-      ) : null}
-
-      <section className="mb-6" aria-label="Operations summary">
-        <SectionHeading title="Operations" />
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          ) : null}
           <StatCard
             label="Active clients"
             value={formatNumber(metrics.activeClients.current)}
             delta={pctChange(metrics.activeClients.current, metrics.activeClients.previous)}
             comparisonLabel={cmp}
             href={q('/crm?status=active')}
-          />
-          <StatCard
-            label="Prospects"
-            value={formatNumber(metrics.prospectiveClients)}
-            hint="Clients in a pre-contract stage."
-            href={q('/crm?status=prospect')}
-          />
-          <StatCard
-            label="Client health"
-            value={metrics.averageHealth ? `${metrics.averageHealth}/100` : '—'}
-            hint={
-              metrics.atRiskClients
-                ? `${metrics.atRiskClients} account${metrics.atRiskClients === 1 ? '' : 's'} below 60`
-                : 'No accounts below 60'
-            }
-            tone={metrics.atRiskClients > 0 ? 'warning' : 'success'}
-            href={q('/crm?health=at_risk')}
+            hint={`${formatNumber(metrics.prospectiveClients)} more in a pre-contract stage`}
           />
           <StatCard
             label="Open tasks"
             value={formatNumber(metrics.openTasks)}
-            hint={`${metrics.tasksDueThisWeek} due in the next 7 days`}
+            hint={
+              metrics.overdueTasks
+                ? `${formatNumber(metrics.overdueTasks)} overdue · ${metrics.tasksDueThisWeek} due this week`
+                : `${metrics.tasksDueThisWeek} due in the next 7 days`
+            }
+            tone={metrics.overdueTasks > 0 ? 'warning' : 'default'}
             href={q('/tasks')}
-          />
-          <StatCard
-            label="Overdue tasks"
-            value={formatNumber(metrics.overdueTasks)}
-            tone={metrics.overdueTasks > 0 ? 'danger' : 'success'}
-            hint={metrics.overdueTasks ? 'Past their due date and not complete' : 'Nothing overdue'}
-            href={q('/tasks?view=overdue')}
           />
         </div>
       </section>
 
-      <section className="mb-6" aria-label="Pipelines">
-        <SectionHeading title="Pipelines" />
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard
-            label="Upcoming meetings"
-            value={formatNumber(metrics.upcomingMeetings)}
-            hint="Scheduled in the next 14 days"
-            href={q('/calendar')}
-          />
-          <StatCard
-            label="Partnership pipeline"
-            value={formatCurrency(metrics.partnershipPipeline.value, 'USD', { compact: true })}
-            hint={`${metrics.partnershipPipeline.count} open · ${formatCurrency(metrics.partnershipPipeline.weighted, 'USD', { compact: true })} weighted`}
-            href={q('/partnerships')}
-          />
-          {canSeeInvestors ? (
-            <>
-              <StatCard
-                label="Investor pipeline"
-                value={formatCurrency(metrics.investorPipeline.value, 'USD', { compact: true })}
-                hint={`${metrics.investorPipeline.count} active · ${formatCurrency(metrics.investorPipeline.weighted, 'USD', { compact: true })} weighted`}
-                href="/investors"
-              />
-              <StatCard
-                label="Committed"
-                value={formatCurrency(metrics.investorPipeline.committed, 'USD', { compact: true })}
-                hint="Investors at the Committed stage"
-                tone={metrics.investorPipeline.committed > 0 ? 'success' : 'default'}
-                href="/investors?stage=committed"
-              />
-            </>
-          ) : null}
-        </div>
+      <section className="mb-6" aria-label="Supporting figures">
+        <MiniStatStrip
+          items={[
+            ...(canSeeFinance
+              ? [
+                  {
+                    label: 'Accounts receivable',
+                    value: formatCurrency(metrics.accountsReceivable),
+                    hint:
+                      metrics.overdueReceivable > 0
+                        ? `${formatCurrency(metrics.overdueReceivable)} overdue`
+                        : 'Nothing overdue',
+                    tone: metrics.overdueReceivable > 0 ? ('warning' as const) : ('default' as const),
+                    href: q('/finances?tab=invoices&status=open'),
+                  },
+                  {
+                    label: 'Upcoming payments',
+                    value: formatCurrency(metrics.upcomingPayments),
+                    hint: 'Contractor invoices not yet paid',
+                    href: q('/team?tab=invoices'),
+                  },
+                  {
+                    label: 'Net cash flow',
+                    value: formatCurrency(metrics.netCashFlow.current),
+                    hint: 'Revenue less recorded expenses',
+                    tone: metrics.netCashFlow.current < 0 ? ('danger' as const) : ('default' as const),
+                    href: q('/finances'),
+                  },
+                ]
+              : []),
+            {
+              label: 'Client health',
+              value: metrics.averageHealth ? `${metrics.averageHealth}/100` : '—',
+              hint: metrics.atRiskClients
+                ? `${metrics.atRiskClients} account${metrics.atRiskClients === 1 ? '' : 's'} below 60`
+                : 'No accounts below 60',
+              tone: metrics.atRiskClients > 0 ? ('warning' as const) : ('success' as const),
+              href: q('/crm?health=at_risk'),
+            },
+            {
+              label: 'Overdue tasks',
+              value: formatNumber(metrics.overdueTasks),
+              hint: metrics.overdueTasks ? 'Past their due date' : 'Nothing overdue',
+              tone: metrics.overdueTasks > 0 ? ('danger' as const) : ('success' as const),
+              href: q('/tasks?view=overdue'),
+            },
+            {
+              label: 'Upcoming meetings',
+              value: formatNumber(metrics.upcomingMeetings),
+              hint: 'In the next 14 days',
+              href: q('/calendar'),
+            },
+            {
+              label: 'Partnership pipeline',
+              value: formatCurrency(metrics.partnershipPipeline.value, 'USD', { compact: true }),
+              hint: `${metrics.partnershipPipeline.count} open · ${formatCurrency(metrics.partnershipPipeline.weighted, 'USD', { compact: true })} weighted`,
+              href: q('/partnerships'),
+            },
+            ...(canSeeInvestors
+              ? [
+                  {
+                    label: 'Investor pipeline',
+                    value: formatCurrency(metrics.investorPipeline.value, 'USD', { compact: true }),
+                    hint: `${metrics.investorPipeline.count} active · ${formatCurrency(metrics.investorPipeline.weighted, 'USD', { compact: true })} weighted`,
+                    href: '/investors',
+                  },
+                  {
+                    label: 'Committed',
+                    value: formatCurrency(metrics.investorPipeline.committed, 'USD', { compact: true }),
+                    hint: 'Investors at the Committed stage',
+                    tone:
+                      metrics.investorPipeline.committed > 0 ? ('success' as const) : ('default' as const),
+                    href: '/investors?stage=committed',
+                  },
+                ]
+              : []),
+          ]}
+        />
+        <SourceNote
+          className="mt-2"
+          source="Records in this system: payments, invoices, subscriptions, expenses, clients, tasks and pipelines (connected, imported and manually entered)"
+        />
       </section>
 
       {metrics.parfax ? (
@@ -245,22 +246,44 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
               </Button>
             }
           />
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-            <StatCard label="Registered users" value={formatNumber(metrics.parfax.totalUsers)} href="/parfax/users" hint={`${formatNumber(metrics.parfax.newUsers)} new in ${range.label.toLowerCase()}`} />
-            <StatCard label="Active (30d)" value={formatNumber(metrics.parfax.activeUsers)} href="/parfax/users?active=30d" />
-            <StatCard label="Paid subscribers" value={formatNumber(metrics.parfax.paidUsers)} hint={`${formatNumber(metrics.parfax.freeUsers)} on free`} href="/parfax/users?plan=paid" />
-            <StatCard label="MRR / ARR" value={formatCurrency(metrics.parfax.mrr)} hint={`${formatCurrency(metrics.parfax.arr, 'USD', { compact: true })} annualised`} href="/parfax/metrics" />
-            <StatCard
-              label="Club scans"
-              value={formatNumber(metrics.parfax.scans)}
-              hint={
-                metrics.parfax.scanAccuracy !== null
-                  ? `${formatPercent(metrics.parfax.scanAccuracy)} accuracy on verified scans`
-                  : 'No verified scans in this period'
-              }
-              href="/parfax/metrics?tab=scans"
-            />
-          </div>
+          <MiniStatStrip
+            columns={5}
+            items={[
+              {
+                label: 'Registered users',
+                value: formatNumber(metrics.parfax.totalUsers),
+                hint: `${formatNumber(metrics.parfax.newUsers)} new in ${range.label.toLowerCase()}`,
+                href: '/parfax/users',
+              },
+              {
+                label: 'Active (30d)',
+                value: formatNumber(metrics.parfax.activeUsers),
+                hint: 'Signed in or scanned in the last 30 days',
+                href: '/parfax/users?active=30d',
+              },
+              {
+                label: 'Paid subscribers',
+                value: formatNumber(metrics.parfax.paidUsers),
+                hint: `${formatNumber(metrics.parfax.freeUsers)} on free`,
+                href: '/parfax/users?plan=paid',
+              },
+              {
+                label: 'MRR / ARR',
+                value: formatCurrency(metrics.parfax.mrr),
+                hint: `${formatCurrency(metrics.parfax.arr, 'USD', { compact: true })} annualised`,
+                href: '/parfax/metrics',
+              },
+              {
+                label: 'Club scans',
+                value: formatNumber(metrics.parfax.scans),
+                hint:
+                  metrics.parfax.scanAccuracy !== null
+                    ? `${formatPercent(metrics.parfax.scanAccuracy)} accuracy on verified scans`
+                    : 'No verified scans in this period',
+                href: '/parfax/metrics?tab=scans',
+              },
+            ]}
+          />
           <SourceNote
             className="mt-2"
             source="ParFax platform records in this system. Connect the ParFax CRM under Integrations for live production reads."
@@ -309,7 +332,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         </section>
       ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid items-start gap-4 lg:grid-cols-3">
         {canSeeFinance && trend.length ? (
           <Card className="lg:col-span-2">
             <CardHeader>

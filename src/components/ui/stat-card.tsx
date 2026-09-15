@@ -95,3 +95,83 @@ export function StatCard({
     wrapped
   );
 }
+
+export interface MiniStatProps {
+  label: string;
+  value: React.ReactNode;
+  hint?: React.ReactNode;
+  href?: string;
+  tone?: 'default' | 'warning' | 'danger' | 'success';
+}
+
+/**
+ * A quieter number for supporting figures. Several of these sit inside one
+ * bordered strip, so a screen can carry a dozen numbers without turning into a
+ * wall of cards.
+ */
+function MiniStat({ label, value, hint, href, tone = 'default' }: MiniStatProps) {
+  const body = (
+    <div className="flex h-full flex-col gap-0.5 px-4 py-3.5">
+      <p className="text-xs text-[var(--fg-muted)]">{label}</p>
+      <p
+        className={cn(
+          'tnum text-lg leading-tight font-semibold tracking-tight',
+          tone === 'warning' && 'text-[var(--warning)]',
+          tone === 'danger' && 'text-[var(--danger)]',
+          tone === 'success' && 'text-[var(--success)]',
+        )}
+      >
+        {value}
+      </p>
+      {hint ? <p className="text-xs text-[var(--fg-subtle)]">{hint}</p> : null}
+    </div>
+  );
+  return (
+    // A hairline outline rather than a gap: neighbouring cells share the same
+    // line, and the strip stays clean however the last row wraps.
+    <div className="bg-[var(--surface)] outline-[0.5px] outline-[var(--border)]">
+      {href ? (
+        <Link
+          href={href}
+          className="block h-full transition-colors hover:bg-[var(--surface-sunken)]"
+        >
+          {body}
+        </Link>
+      ) : (
+        body
+      )}
+    </div>
+  );
+}
+
+const STRIP_COLUMNS: Record<number, string> = {
+  3: 'grid-cols-2 sm:grid-cols-3',
+  4: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4',
+  5: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5',
+};
+
+/**
+ * A row of supporting figures in one bordered block. Takes the figures as data
+ * rather than children so a caller can build the list conditionally without the
+ * strip having to reason about fragments.
+ */
+export function MiniStatStrip({
+  items,
+  columns = 4,
+}: {
+  items: MiniStatProps[];
+  columns?: 3 | 4 | 5;
+}) {
+  return (
+    <div
+      className={cn(
+        'grid overflow-hidden rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-card)]',
+        STRIP_COLUMNS[columns],
+      )}
+    >
+      {items.map((item) => (
+        <MiniStat key={item.label} {...item} />
+      ))}
+    </div>
+  );
+}

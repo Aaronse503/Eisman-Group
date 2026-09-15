@@ -86,3 +86,66 @@ export const RECURRENCE_PRESETS = [
   { value: 'FREQ=MONTHLY;INTERVAL=3', label: 'Every quarter' },
   { value: 'FREQ=YEARLY', label: 'Every year' },
 ] as const;
+
+const RRULE_DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'] as const;
+
+/**
+ * The next due date for a recurring task, worked out from its rule.
+ *
+ * This understands the subset of RRULE the interface can produce: FREQ,
+ * INTERVAL and, for weekly rules, BYDAY. Anything else returns null and the
+ * task simply does not recur, rather than landing on a wrong date.
+ */
+export function nextOccurrence(rule: string, from: Date): Date | null {
+  const freq = /FREQ=(\w+)/.exec(rule)?.[1]?.toUpperCase();
+  const interval = Math.max(1, Number(/INTERVAL=(\d+)/.exec(rule)?.[1] ?? '1'));
+  const next = new Date(from.getTime());
+  if (Number.isNaN(next.getTime())) return null;
+
+  switch (freq) {
+    case 'DAILY':
+      next.setUTCDate(next.getUTCDate() + interval);
+      return next;
+
+    case 'WEEKLY': {
+      const byDay = /BYDAY=([A-Z,]+)/.exec(rule)?.[1];
+      if (!byDay) {
+        next.setUTCDate(next.getUTCDate() + 7 * interval);
+        return next;
+      }
+      // "Every weekday" and similar rules step to the next listed day rather
+      // than jumping a whole week.
+      const wanted = new Set(
+        byDay.split(',').map((d) => RRULE_DAYS.indexOf(d.trim() as (typeof RRULE_DAYS)[number])),
+      );
+      wanted.delete(-1);
+      if (wanted.size === 0) {
+        next.setUTCDate(next.getUTCDate() + 7 * interval);
+        return next;
+      }
+      for (let i = 1; i <= 7; i++) {
+        next.setUTCDate(next.getUTCDate() + 1);
+        if (wanted.has(next.getUTCDay())) return next;
+      }
+      return next;
+    }
+
+    case 'MONTHLY':
+    case 'YEARLY': {
+      // Adding to the month directly overflows: 31 January plus one month
+      // would land in March. Clamp to the last day of the target month.
+      const day = next.getUTCDate();
+      next.setUTCDate(1);
+      if (freq === 'MONTHLY') next.setUTCMonth(next.getUTCMonth() + interval);
+      else next.setUTCFullYear(next.getUTCFullYear() + interval);
+      const lastDay = new Date(
+        Date.UTC(next.getUTCFullYear(), next.getUTCMonth() + 1, 0),
+      ).getUTCDate();
+      next.setUTCDate(Math.min(day, lastDay));
+      return next;
+    }
+
+    default:
+      return null;
+  }
+}

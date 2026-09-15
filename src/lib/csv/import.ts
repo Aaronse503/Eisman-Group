@@ -215,8 +215,42 @@ export interface ValidationIssue {
   value: string;
 }
 
-const DATE_FIELDS = /(_at|_date|^signup)/;
-const NUMBER_FIELDS = /(amount|value|total|paid|retainer|score|hours|size_min|size_max|capacity)/;
+/**
+ * Fields whose value must be parsed rather than stored verbatim. Listed
+ * explicitly: a name-pattern guess silently let `contract_start` through as
+ * text, which the database then rejected at insert time.
+ */
+const DATE_FIELDS = new Set([
+  'contract_start',
+  'contract_end',
+  'renewal_date',
+  'due_date',
+  'start_date',
+  'issue_date',
+  'signup_at',
+  'last_active_at',
+]);
+
+/** Date-only fields; the rest keep their time component. */
+const DATE_ONLY_FIELDS = new Set([
+  'contract_start',
+  'contract_end',
+  'renewal_date',
+  'start_date',
+  'issue_date',
+]);
+
+const NUMBER_FIELDS = new Set([
+  'monthly_retainer',
+  'contract_value',
+  'potential_amount',
+  'health_score',
+  'capacity_hours',
+  'check_size_min',
+  'check_size_max',
+  'total',
+  'amount_paid',
+]);
 
 /**
  * Validates mapped rows before anything is written. Returns per-row issues so
@@ -247,21 +281,26 @@ export function validateRows(
         continue;
       }
 
-      if (DATE_FIELDS.test(field.key)) {
+      if (DATE_FIELDS.has(field.key)) {
         const parsed = new Date(rawValue);
         if (Number.isNaN(parsed.getTime())) {
           issues.push({ row: rowNumber, field: field.key, message: `${field.label} is not a date`, value: rawValue });
           rowOk = false;
           continue;
         }
-        record[field.key] = field.key.endsWith('_date') ? parsed.toISOString().slice(0, 10) : parsed;
+        record[field.key] = DATE_ONLY_FIELDS.has(field.key)
+          ? parsed.toISOString().slice(0, 10)
+          : parsed;
         continue;
       }
 
-      if (NUMBER_FIELDS.test(field.key)) {
+      if (NUMBER_FIELDS.has(field.key)) {
+        // Strip currency symbols and thousands separators, then insist on
+        // something that actually looks like a number: `Number('')` is 0, so a
+        // value like "about five" would otherwise import silently as zero.
         const cleaned = rawValue.replace(/[^0-9.\-]/g, '');
         const num = Number(cleaned);
-        if (!Number.isFinite(num)) {
+        if (!/^-?\d*\.?\d+$/.test(cleaned) || !Number.isFinite(num)) {
           issues.push({ row: rowNumber, field: field.key, message: `${field.label} is not a number`, value: rawValue });
           rowOk = false;
           continue;

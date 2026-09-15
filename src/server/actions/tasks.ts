@@ -6,7 +6,7 @@ import { requireActor, requireCompanyAccess, ForbiddenError } from '@/lib/auth/a
 import { recordActivity } from '@/lib/activity';
 import { fieldErrors, type ActionResult } from '@/lib/validation/schemas';
 import { quickTaskSchema, taskSchema } from '@/lib/validation/tasks';
-import { TASK_STATUSES } from '@/lib/domain/tasks';
+import { TASK_STATUSES, nextOccurrence } from '@/lib/domain/tasks';
 
 function fail(err: unknown): ActionResult<never> {
   if (err instanceof ForbiddenError) {
@@ -137,29 +137,6 @@ export async function updateTaskAction(id: string, input: unknown): Promise<Acti
     return { ok: true, data: { id } };
   } catch (err) {
     return fail(err);
-  }
-}
-
-/** Advances a recurring task by creating the next occurrence when completed. */
-function nextOccurrence(rule: string, from: Date): Date | null {
-  const freq = /FREQ=(\w+)/.exec(rule)?.[1]?.toUpperCase();
-  const interval = Number(/INTERVAL=(\d+)/.exec(rule)?.[1] ?? '1');
-  const next = new Date(from);
-  switch (freq) {
-    case 'DAILY':
-      next.setUTCDate(next.getUTCDate() + interval);
-      return next;
-    case 'WEEKLY':
-      next.setUTCDate(next.getUTCDate() + 7 * interval);
-      return next;
-    case 'MONTHLY':
-      next.setUTCMonth(next.getUTCMonth() + interval);
-      return next;
-    case 'YEARLY':
-      next.setUTCFullYear(next.getUTCFullYear() + interval);
-      return next;
-    default:
-      return null;
   }
 }
 

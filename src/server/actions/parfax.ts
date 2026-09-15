@@ -7,6 +7,7 @@ import { recordActivity } from '@/lib/activity';
 import { recordAudit } from '@/lib/audit';
 import { objectsToCsv } from '@/lib/csv/client';
 import type { ActionResult } from '@/lib/validation/schemas';
+import { parfaxMetricSchema } from '@/lib/validation/parfax';
 
 /**
  * ParFax administration.
@@ -338,16 +339,6 @@ export async function setSupportIssueStatusAction(
   }
 }
 
-const metricSchema = z.object({
-  metricKey: z.string().trim().min(2).max(60),
-  periodStart: z.string().min(1, 'Choose a start date'),
-  periodEnd: z.string().min(1, 'Choose an end date'),
-  value: z.coerce.number(),
-  unit: z.string().trim().max(30).optional(),
-  kind: z.enum(['manual', 'forecast', 'target']),
-  sourceLabel: z.string().trim().min(4, 'Say where this number came from'),
-  note: z.string().trim().max(1000).optional(),
-});
 
 /**
  * Records a target, forecast or manual historical figure.
@@ -359,7 +350,7 @@ const metricSchema = z.object({
  */
 export async function upsertParfaxMetricAction(input: unknown): Promise<ActionResult<{ id: string }>> {
   try {
-    const parsed = metricSchema.safeParse(input);
+    const parsed = parfaxMetricSchema.safeParse(input);
     if (!parsed.success) {
       return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input.' };
     }
