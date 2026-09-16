@@ -1,4 +1,7 @@
 import { config } from 'dotenv';
+// The deployment values first, so this checks what you are about to deploy
+// rather than what your laptop happens to be set up with.
+config({ path: '.env.production.local', quiet: true });
 config({ path: '.env.local', quiet: true });
 config({ quiet: true });
 

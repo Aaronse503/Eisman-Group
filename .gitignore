@@ -20,3 +20,6 @@ apps/mobile/.expo/
 apps/mobile/dist/
 apps/mobile/ios/
 apps/mobile/android/
+
+# Netlify build output.
+.netlify/

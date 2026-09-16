@@ -9,6 +9,9 @@ front of you.
 A Node 20+ host that can run a Next.js server, and a Postgres database. That
 is all — no queue, no cache, no object store, no search service.
 
+**`GO_LIVE.md` is the step-by-step checklist for Option A.** This file explains
+the reasoning and the alternatives.
+
 ## Option A: free, on Netlify and Supabase
 
 **$0 a month**, and enough for a team of this size. The monthly figure people
@@ -23,7 +26,9 @@ both have free tiers that this fits inside.
    the **service role** key.
 2. **Import the repository** at netlify.com. `netlify.toml` in this repository
    already tells it what to build and where the application is, so there is no
-   build configuration to work out.
+   build configuration to work out. If it asks which package to build, or for a
+   base directory, **leave it at the repository root** — pointing it inside
+   `apps/web` stops the shared workspace packages from installing.
 3. **Environment variables**, under *Site configuration → Environment
    variables*:
 

@@ -116,6 +116,7 @@ These are deliberate, and the tests enforce them:
 | File | What it covers |
 | --- | --- |
 | `SETUP.md` | Getting it running, from a laptop to a server |
+| `GO_LIVE.md` | Putting it online, free, step by step |
 | `ARCHITECTURE.md` | How the system is put together |
 | `DATABASE.md` | The schema, the migrations and the data model |
 | `INTEGRATIONS.md` | Every integration, what it needs, and what it does |

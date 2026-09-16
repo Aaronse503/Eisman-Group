@@ -27,7 +27,8 @@
     "test": "npm run test --workspaces --if-present",
     "test:e2e": "npm run test:e2e --workspace @eisman/web",
     "verify": "npm run typecheck && npm run lint && npm run test",
-    "check:deploy": "npm run check:deploy --workspace @eisman/web"
+    "check:deploy": "npm run --silent check:deploy --workspace @eisman/web",
+    "gen:secrets": "npm run --silent gen:secrets --workspace @eisman/web"
   },
   "overrides": {
     "postcss": "^8.5.28",
