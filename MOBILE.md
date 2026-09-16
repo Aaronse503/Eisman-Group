@@ -40,8 +40,28 @@ npm run dev                      # the API the app talks to, on :3000
 EXPO_PUBLIC_API_URL=http://<your-lan-ip>:3000 npm run mobile
 ```
 
-Then open the QR code in Expo Go, or in a development build. `localhost` is the
-phone itself, so a device on your network needs your machine's LAN address.
+Then scan the QR code with **Expo Go** (free, from either store), or open it in
+a development build. `localhost` is the phone itself, so a device on your
+network needs your machine's LAN address, and both have to be on the same
+Wi-Fi.
+
+### What Expo Go can and cannot do
+
+Expo Go is the quickest way to hold the app in your hand, and almost all of it
+works there: signing in, every screen, Face ID or a fingerprint, the camera,
+file uploads, offline capture and sync.
+
+Two things need a development build, because they are native modules Expo Go
+does not carry:
+
+| | In Expo Go | In a development build |
+| --- | --- | --- |
+| Push notifications | Cannot be issued a token | Works |
+| Dictation | Button not offered | Works |
+
+Neither fails silently. The Settings screen says Expo Go cannot receive push
+notifications, and the note screen says dictation needs a development build
+and to type instead — rather than showing a control that does nothing.
 
 `npm run mobile -- --web` opens the app in a browser. That is a development
 convenience for checking layout and wiring, not the product: there is no

@@ -76,7 +76,22 @@ export async function registerForPush(): Promise<PushRegistration> {
     };
   }
 
-  const token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+  let token: string;
+  try {
+    token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+  } catch (err) {
+    // Expo Go cannot be issued a project-scoped push token. Say that plainly
+    // rather than reporting it as a problem reaching the server.
+    const isExpoGo = Constants.appOwnership === 'expo';
+    return {
+      granted: true,
+      token: null,
+      reason: isExpoGo
+        ? 'Expo Go cannot receive push notifications. Everything else works; notifications need a development build.'
+        : `This device could not be issued a push token. ${err instanceof Error ? err.message : ''}`.trim(),
+    };
+  }
+
   await api.registerPushToken(
     await installationId(),
     Platform.OS === 'ios' ? 'ios' : 'android',
