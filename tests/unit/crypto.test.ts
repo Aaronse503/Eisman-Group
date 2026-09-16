@@ -63,6 +63,8 @@ describe('session tokens', () => {
 
 describe('credential encryption', () => {
   it('round-trips a secret', () => {
+    // Shaped like a provider credential without being one: a realistic-looking
+    // key in a fixture trips secret scanners on the way to the repository.
     const secret = 'example-provider-credential-abcdef123456';
     const payload = encryptSecret(secret);
     expect(payload).not.toContain(secret);
