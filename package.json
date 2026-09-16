@@ -2,7 +2,7 @@
   "name": "eisman-command-center",
   "version": "1.0.0",
   "private": true,
-  "description": "Eisman Holdings Command Center — the web application, the mobile application, and the code they share.",
+  "description": "Eisman Holdings Command Center \u2014 the web application, the mobile application, and the code they share.",
   "engines": {
     "node": ">=20.9.0"
   },
@@ -25,5 +25,9 @@
     "test": "npm run test --workspaces --if-present",
     "test:e2e": "npm run test:e2e --workspace @eisman/web",
     "verify": "npm run typecheck && npm run lint && npm run test"
+  },
+  "overrides": {
+    "postcss": "^8.5.28",
+    "decode-uri-component": "^0.4.1"
   }
 }

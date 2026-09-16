@@ -1,7 +1,8 @@
 import type { PipelineEntry } from '@eisman/shared';
-import { authed, forbidden } from '@/lib/api/route';
+import { authed, forbidden, jsonBody, badRequest } from '@/lib/api/route';
 import { apiScope } from '@/lib/api/scope';
 import { listInvestors, listPartnerships } from '@/lib/queries/growth';
+import { createInvestorAction, createPartnershipAction } from '@/server/actions/growth';
 
 /**
  * The investor or partnership pipeline.
@@ -51,4 +52,21 @@ export const GET = authed<{ kind: string; items: PipelineEntry[] }>(async ({ act
       isDemo: r.is_demo,
     })),
   };
+});
+
+/**
+ * Adds an investor or a partnership.
+ *
+ * Both delegate to the actions the web forms use, so the same fields are
+ * required and the same audit entry is written.
+ */
+export const POST = authed(async ({ request, params }) => {
+  const kind = params.get('kind') === 'investor' ? 'investor' : 'partnership';
+  const body = await jsonBody(request);
+  const result =
+    kind === 'investor'
+      ? await createInvestorAction(body)
+      : await createPartnershipAction(body);
+  if (!result.ok) throw badRequest(result.error, result.fields);
+  return { id: result.data.id };
 });

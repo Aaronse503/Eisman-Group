@@ -13,3 +13,9 @@ coverage/
 playwright-report/
 test-results/
 .vercel
+
+# Expo
+apps/mobile/.expo/
+apps/mobile/dist/
+apps/mobile/ios/
+apps/mobile/android/
