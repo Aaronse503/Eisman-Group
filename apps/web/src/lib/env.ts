@@ -118,7 +118,30 @@ export function productionEnvProblems(env: Env = getEnv()): string[] {
     problems.push('ENCRYPTION_KEY is required in production to encrypt integration credentials.');
   if (env.STORAGE_DRIVER === 'supabase' && !(env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY))
     problems.push('STORAGE_DRIVER=supabase requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.');
+  if (env.STORAGE_DRIVER === 'local' && isEphemeralFilesystem())
+    problems.push(
+      'STORAGE_DRIVER=local cannot be used on this host: its filesystem is discarded between ' +
+        'requests, so uploaded documents would appear to save and then be gone. ' +
+        'Set STORAGE_DRIVER=supabase with SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and ' +
+        'SUPABASE_STORAGE_BUCKET.',
+    );
   return problems;
+}
+
+/**
+ * True on a host that throws the filesystem away between invocations.
+ *
+ * Writing uploads to local disk there loses them, and losing a document while
+ * reporting a successful upload is worse than refusing to start.
+ */
+export function isEphemeralFilesystem(): boolean {
+  return Boolean(
+    process.env.NETLIFY ||
+      process.env.VERCEL ||
+      process.env.AWS_LAMBDA_FUNCTION_NAME ||
+      process.env.FUNCTIONS_WORKER_RUNTIME ||
+      process.env.K_SERVICE,
+  );
 }
 
 export const isDemoModeAvailable = () => getEnv().DEMO_MODE && !getEnv().DISABLE_DEMO_DATA;

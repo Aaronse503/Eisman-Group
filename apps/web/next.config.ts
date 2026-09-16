@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { join } from 'node:path';
 
 /**
  * Security headers applied to every response. CSP is intentionally strict;
@@ -22,8 +23,24 @@ const csp = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+
+  // The development server and a production build must not share a directory.
+  // `next dev` rewrites the manifests in place, so a build that was made
+  // earlier ends up serving a mixture of the two: the HTML references chunks
+  // from one build and the files on disk are from the other. It fails as
+  // "a client-side exception has occurred", which looks like an application
+  // fault and is not one.
+  distDir: isDev ? '.next-dev' : '.next',
   poweredByHeader: false,
   serverExternalPackages: ['@electric-sql/pglite', 'pg', 'pdfjs-dist'],
+
+  // This is a workspace inside a monorepo, and the migrations live at the top
+  // of it. Without both of these a serverless build ships the code without the
+  // SQL, and the first request finds no schema to run against.
+  outputFileTracingRoot: join(import.meta.dirname, '..', '..'),
+  outputFileTracingIncludes: {
+    '/**/*': ['../../db/migrations/**/*.sql'],
+  },
   eslint: { ignoreDuringBuilds: false },
   typescript: { ignoreBuildErrors: false },
   async headers() {

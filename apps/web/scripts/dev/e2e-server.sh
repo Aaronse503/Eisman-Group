@@ -13,6 +13,9 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 
 export AUTH_SECRET="${AUTH_SECRET:-e2e-only-secret-key-at-least-32-characters}"
+# A throwaway key for a throwaway database. The suite runs a production build,
+# and a production build refuses to start without one — which is the point.
+export ENCRYPTION_KEY="${ENCRYPTION_KEY:-ZTJlLW9ubHkta2V5LW5vdC1mb3ItYW55dGhpbmcxMjM=}"
 export DEMO_MODE=true
 # The suite signs in dozens of times from one address; the limiter would
 # otherwise start refusing part-way through a run.
@@ -42,6 +45,10 @@ if [ -n "${E2E_DATABASE_URL:-}" ]; then
   fi
 else
   export PGLITE_DATA_DIR="${PGLITE_DATA_DIR:-.data/e2e-pglite}"
+  # A production build refuses to start on the embedded database, correctly.
+  # Only this path takes the escape hatch; with E2E_DATABASE_URL set, the same
+  # checks a deployment faces apply here too.
+  export UNSAFE_ALLOW_UNCONFIGURED_PRODUCTION=1
   echo "Using the embedded database at $PGLITE_DATA_DIR."
   echo "Set E2E_DATABASE_URL to a scratch Postgres for a reliable full run."
 
@@ -61,8 +68,15 @@ fi
 npx tsx scripts/seed.ts
 npx tsx scripts/dev/e2e-prepare.ts
 
-if [ ! -d .next ]; then
-  echo "No build found; building first."
+# Always build. A directory left over from an earlier commit serves that
+# commit's code against this commit's tests, and the failures that produces
+# look like application faults rather than a stale build. Set E2E_SKIP_BUILD=1
+# when iterating on the tests themselves and the application has not changed.
+if [ "${E2E_SKIP_BUILD:-}" = "1" ] && [ -d .next ]; then
+  echo "Reusing the existing build (E2E_SKIP_BUILD=1)."
+else
+  echo "Building the application."
+  rm -rf .next
   npx next build
 fi
 exec npx next start -p "$PORT"

@@ -112,7 +112,10 @@ what you yourself just viewed — each listed with its reason.
   routing, account number, iban or cvv.
 - In production the application refuses to start without `AUTH_SECRET`,
   `DATABASE_URL` and `ENCRYPTION_KEY`, rather than quietly using a development
-  default.
+  default. The check runs in `src/instrumentation.ts`, before the server
+  accepts a request, and names each missing variable. It also refuses
+  `STORAGE_DRIVER=local` on a host whose filesystem is discarded between
+  requests, where an upload would report success and then be gone.
 
 ## The audit log
 

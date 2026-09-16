@@ -1,0 +1,30 @@
+# Netlify build configuration.
+#
+# This is a monorepo, so the build runs at the top (workspaces have to be
+# installed together) and Netlify is told where the application actually is.
+# The Next.js runtime plugin is detected automatically and turns the build into
+# functions; nothing here pins a version of it.
+#
+# The database is not part of this. Set DATABASE_URL, AUTH_SECRET and
+# ENCRYPTION_KEY in Netlify's own environment settings — never in this file.
+# See DEPLOYMENT.md.
+
+[build]
+  command = "npm run build"
+  publish = "apps/web/.next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Demo data has no place on a deployed instance.
+  DEMO_MODE = "false"
+  DISABLE_DEMO_DATA = "true"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Reminders that have come due are turned into notifications on a schedule,
+# not by a request. netlify/functions/reminders.mjs calls the application's own
+# endpoint every fifteen minutes; it authenticates with CRON_SECRET, and
+# without that variable set the endpoint refuses to run.
+[functions]
+  directory = "netlify/functions"

@@ -9,9 +9,77 @@ front of you.
 A Node 20+ host that can run a Next.js server, and a Postgres database. That
 is all — no queue, no cache, no object store, no search service.
 
-## Option A: Vercel and a managed Postgres
+## Option A: free, on Netlify and Supabase
 
-The least work. Roughly **$20–45 a month** for a small team.
+**$0 a month**, and enough for a team of this size. The monthly figure people
+quote for something like this is almost always the database, not the hosting;
+both have free tiers that this fits inside.
+
+1. **Database and file storage.** Create a project at supabase.com. From
+   *Project settings → Database*, copy the **connection pooler** string — not
+   the direct one; a serverless host opens many short-lived connections and an
+   unpooled Postgres runs out. From *Storage*, create a bucket named
+   `command-center`. From *Project settings → API*, copy the project URL and
+   the **service role** key.
+2. **Import the repository** at netlify.com. `netlify.toml` in this repository
+   already tells it what to build and where the application is, so there is no
+   build configuration to work out.
+3. **Environment variables**, under *Site configuration → Environment
+   variables*:
+
+   ```
+   AUTH_SECRET=              # openssl rand -base64 48
+   ENCRYPTION_KEY=           # openssl rand -base64 32, exactly 32 bytes
+   DATABASE_URL=             # the pooler string from step 1
+   STORAGE_DRIVER=supabase
+   SUPABASE_URL=
+   SUPABASE_SERVICE_ROLE_KEY=
+   SUPABASE_STORAGE_BUCKET=command-center
+   CRON_SECRET=              # openssl rand -base64 32
+   APP_URL=                  # your Netlify URL, once you know it
+   ```
+
+   `DEMO_MODE=false` and `DISABLE_DEMO_DATA=true` are set in `netlify.toml`
+   already. Paste the secrets into Netlify's own settings; never into a file in
+   the repository.
+4. **Create the schema and the owner account** from a checkout on your own
+   machine, pointed at the hosted database:
+
+   ```bash
+   DATABASE_URL="…" npm run db:migrate
+   DATABASE_URL="…" npm run db:seed -- --no-demo
+   ```
+
+   The application also applies outstanding migrations itself on first use, so
+   this is belt and braces — but doing it from a checkout means you watch them
+   apply rather than finding out from a log.
+5. **Deploy**, then sign in and change the owner password immediately.
+
+### What "free" actually costs you
+
+Worth knowing before you rely on it, rather than after:
+
+- **A free Supabase database pauses after about a week with no queries.**
+  Restarting it is a button in their dashboard, but it is a wait you did not
+  plan. For a system in daily use this never comes up; for one you open
+  occasionally, it will.
+- **There are no backups you should rely on.** The audit log cannot be
+  reconstructed and neither can uploaded documents. Take your own, on a
+  schedule you have actually set — see **Backups** below. This is the single
+  strongest argument for paying later.
+- **Storage and bandwidth are capped**, generously for a team of this size but
+  not infinitely. Check the current numbers; both providers change them.
+- **Vercel's free Hobby plan is not an option here**, whatever its limits say:
+  its terms are for non-commercial personal projects, and this is a business
+  system. Netlify's free tier carries no such restriction. If you prefer
+  Vercel, it is their paid plan.
+
+Moving from free to paid later is a plan change on the same accounts, not a
+migration. Nothing about the application changes.
+
+## Option B: Vercel and a managed Postgres
+
+Roughly **$20–45 a month** for a small team, on a paid Vercel plan.
 
 1. **Database.** Create a Postgres on Supabase, Neon or Vercel Postgres. Copy
    the pooled connection string.
@@ -43,7 +111,7 @@ The least work. Roughly **$20–45 a month** for a small team.
 Use a connection-pooled URL. Serverless functions open many short-lived
 connections, and an unpooled Postgres will run out.
 
-## Option B: your own server
+## Option C: your own server
 
 More control, less monthly cost, more of your time.
 
@@ -70,6 +138,10 @@ notification. `POST /api/v1/cron/reminders` does that for everything that has
 come due. It authenticates with `CRON_SECRET` as a bearer token, and with no
 secret configured it refuses to run at all rather than leaving an endpoint
 open that writes notifications to other people.
+
+On Netlify this is already wired: `netlify/functions/reminders.mjs` runs every
+fifteen minutes and calls the endpoint with the secret. Nothing to set up
+beyond `CRON_SECRET`.
 
 On Vercel, add to `vercel.json`:
 
@@ -166,10 +238,15 @@ Worth a look weekly for the first month:
 
 | | Roughly |
 | --- | --- |
-| Vercel Hobby | free, fine to start; Pro is $20/user/month if you outgrow it |
-| Supabase or Neon | free tier to start; ~$25/month for a production instance |
+| Netlify Starter | free, and its terms allow commercial use |
+| Supabase | free tier covers the database and file storage; ~$25/month when you want backups and no pausing |
+| Vercel | Hobby is free but **non-commercial only**; Pro is $20/user/month |
 | Anthropic API | pay per use; optional, and the local provider costs nothing |
 | Your own server | $10–20/month for a VPS that would handle this comfortably |
+
+**Free is a real option for this**, on Netlify plus Supabase. What you give up
+is backups and a database that never pauses, which is worth paying for once
+the records in it are ones you would miss.
 
 Nothing will be spent without you deciding to spend it.
 
