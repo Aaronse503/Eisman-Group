@@ -226,7 +226,40 @@ Under your avatar. It follows your system setting unless you choose.
 
 ## On a phone
 
+### In a browser
+
 Everything works. The navigation is behind the menu button, numbers sit
 two-up, and tables scroll. Reading, checking, approving, adding a task or a
 note is comfortable. The boards, the finance tables and the import wizard are
 better on a laptop — they are dense by nature.
+
+### The app
+
+There is also an iOS and Android app. Same sign-in, same companies, same
+permissions — it is the same system, not a copy of it, so a change made on the
+phone is on the laptop before you have put it down.
+
+Five tabs along the bottom: **Home**, **Tasks**, **CRM**, **Calendar** and
+**More**. The **+** in the corner creates a task, note, contact, meeting,
+investor, partnership or document from wherever you are. The workspace
+switcher is top left, exactly as on the web.
+
+Worth knowing:
+
+- **Face ID or your fingerprint** can be required each time the app opens.
+  Settings → Unlocking. Off until you turn it on.
+- **Dictate a note** with the microphone button. It is transcribed on the
+  phone; the audio goes nowhere.
+- **Photograph a document** and it uploads to the same place as a file
+  dropped on the web — same folders, same access levels.
+- **No signal is fine.** Records you have looked at recently stay readable and
+  say when they were last fetched. New tasks and notes queue up and send
+  themselves when you are back on. The **Sync** screen (under More) shows what
+  is waiting, and anything the server refused, with the reason.
+- **Notifications** need turning on once, under Settings. If the server is not
+  set up to send them, the screen says so rather than offering a switch that
+  does nothing.
+
+Imports, financial reporting, integration setup, permissions, the organization
+chart and the audit log are deliberately not on the phone. They need room to
+be done carefully.

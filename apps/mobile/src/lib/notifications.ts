@@ -1,9 +1,12 @@
+import * as React from 'react';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+import { useRouter } from 'expo-router';
 import { api } from './api';
 import { installationId } from './storage';
+import { routeForNotification, type NotificationPayload } from './deep-links';
 
 /**
  * Push notifications.
@@ -89,4 +92,47 @@ export async function unregisterPush(): Promise<void> {
     Platform.OS === 'ios' ? 'ios' : 'android',
     null,
   );
+}
+
+/**
+ * Opens the record a notification is about when someone taps it.
+ *
+ * Handles both a tap while the app is running and a tap that started it: the
+ * last response is read once on mount, so a notification opened from a cold
+ * start lands on the same screen.
+ */
+export function useNotificationRouting(enabled: boolean) {
+  const router = useRouter();
+  const handled = React.useRef<string | null>(null);
+
+  const open = React.useCallback(
+    (response: Notifications.NotificationResponse | null) => {
+      if (!response) return;
+      const id = response.notification.request.identifier;
+      if (handled.current === id) return;
+      handled.current = id;
+      const route = routeForNotification(
+        response.notification.request.content.data as NotificationPayload | undefined,
+      );
+      if (route) router.push(route as never);
+    },
+    [router],
+  );
+
+  React.useEffect(() => {
+    // There are no push notifications in a browser; `expo start --web` is a
+    // development convenience, and asking for them there throws.
+    if (!enabled || Platform.OS === 'web') return;
+    let cancelled = false;
+    Notifications.getLastNotificationResponseAsync()
+      .then((response) => {
+        if (!cancelled) open(response);
+      })
+      .catch(() => undefined);
+    const subscription = Notifications.addNotificationResponseReceivedListener(open);
+    return () => {
+      cancelled = true;
+      subscription.remove();
+    };
+  }, [enabled, open]);
 }

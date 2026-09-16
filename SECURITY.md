@@ -27,6 +27,45 @@ Each person can see their own active sessions under **Settings → Sessions**,
 with the device, address and last activity, and can revoke any of them.
 Changing a password revokes every other session.
 
+## On a phone
+
+The mobile application is a second way in, not a second set of rules. It
+carries the same session token as a bearer token instead of a cookie; the
+expiry, the revocation, the rate limiting and the lock on a temporary password
+are the same code, not a parallel implementation. A session revoked under
+**Settings → Sessions** stops the phone as well.
+
+- The token is stored in the **device keychain** (iOS) or the keystore-backed
+  encrypted store (Android), marked as available only when the device is
+  unlocked and only on that device — so it does not travel in a backup to a
+  new phone. Cached records and preferences go to ordinary storage; the token
+  never does.
+- **Face ID, Touch ID or a fingerprint** can be required each time the app
+  opens. The app then starts on a lock screen rather than on your data. It is
+  a second gate, not a replacement for the password, and it is off until you
+  turn it on.
+- The API sends no `Access-Control-Allow-Credentials`, so a browser page on
+  another origin cannot make an authenticated request on your behalf. The
+  token has to be presented deliberately.
+- Permissions are sent to the device so the interface can hide what a person
+  cannot use. That is a courtesy, not a control: the server checks every
+  request regardless of what the device believes, and row-level security sits
+  behind that.
+- A device registers under an installation id it generates once. Reinstalling
+  produces a new one, which is correct — it is a different installation, with
+  its own notification permission.
+- Push tokens are stored per device and cleared when the push service reports
+  the device as gone, which stops delivery at the source. A push carries the
+  same title and line as the notification it came from, plus the id of the
+  record it opens — never the record itself, so a locked screen shows a
+  heading, not the contents.
+- A push travels through Apple's or Google's service, which is outside this
+  system. Notifications are written for that: a heading and a pointer, not a
+  figure or a quotation. Anything more is read in the app, after the session
+  and the permission check.
+- Dictation is transcribed **on the device**. Audio does not leave the phone,
+  and no speech service is involved.
+
 ## Who can do what
 
 Seven roles, granted per company. A grant with no company is holdings-wide and
@@ -149,6 +188,29 @@ The application sets a Content Security Policy, `X-Frame-Options: DENY`,
 `X-Content-Type-Options: nosniff`, a referrer policy, a permissions policy, and
 HSTS in production. Every database query is parameterised; there is no string
 interpolation of user input into SQL.
+
+## Known dependency advisories
+
+`npm audit` is not clean, and pretending otherwise would be worse than saying
+what is there. As of the last check, six advisories, none of them in code this
+application ships to a server:
+
+| Package | Where it comes from | Assessment |
+| --- | --- | --- |
+| `image-size` | metro, the React Native bundler | Bundler only, on a developer's machine. Fixed in 2.x; metro pins 1.x, so it clears when Expo updates. |
+| `uuid` | `xcode`, used by `expo prebuild` | Build tooling on a developer's machine. |
+| `vitest`, `@vitest/mocker` | the test runner | Never shipped. The fix is a major version; the upgrade is queued, not urgent. |
+| `decode-uri-component` | `query-string`, inside `expo-router` | **The one that runs on a device.** No fixed version is published — the advisory covers every release including the newest. |
+
+The last one is worth understanding rather than dismissing: it is a
+denial-of-service in URL parsing, reachable by getting someone to open a
+crafted `eisman://` link, and the worst outcome is that the app becomes
+unresponsive until it is restarted. No data is exposed. It will be picked up
+automatically when `query-string` publishes a fix; there is nothing to do in
+the meantime but know it is there.
+
+Re-check with `npm audit` before a release, and update this table rather than
+deleting it.
 
 ## Reporting something
 

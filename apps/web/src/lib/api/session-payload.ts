@@ -3,6 +3,7 @@ import type { ApiCompany, ApiUser, SessionResponse } from '@eisman/shared';
 import { permissionsForCompany, rolesForCompany } from '@eisman/shared';
 import type { Actor } from '@/lib/auth/actor';
 import { getEnv } from '@/lib/env';
+import { pushStatus } from '@/lib/api/push';
 
 export function toApiUser(user: Actor['user']): ApiUser {
   return {
@@ -50,5 +51,6 @@ export function sessionPayload(
     roles: rolesForCompany(actor.grants, null),
     permissions: [...permissionsForCompany(actor.grants, null)],
     demoMode: getEnv().DEMO_MODE,
+    push: (({ configured, reason }) => ({ configured, reason }))(pushStatus()),
   };
 }

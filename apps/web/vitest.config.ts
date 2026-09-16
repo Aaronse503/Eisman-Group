@@ -12,5 +12,11 @@ export default defineConfig({
     poolOptions: { forks: { singleFork: true } },
     setupFiles: ['tests/setup.ts'],
   },
-  resolve: { alias: { '@': resolve(__dirname, 'src') } },
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+      // See tests/stubs/server-only.ts.
+      'server-only': resolve(__dirname, 'tests/stubs/server-only.ts'),
+    },
+  },
 });

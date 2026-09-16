@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, useWindowDimensions } from 'react-native';
 import {
   darkColors,
   fontSize,
@@ -82,4 +82,35 @@ export function useTheme(): Theme {
 export function useThemePreference() {
   const { preference, setPreference } = React.useContext(ThemeContext);
   return { preference, setPreference };
+}
+
+/**
+ * How much room there is.
+ *
+ * A tablet is not a big phone: full-width text at 1024 points is unreadable,
+ * and a two-column list of cards uses the space the device actually has. Every
+ * screen gets this from `Screen`, so the rule lives in one place.
+ */
+export const WIDE_BREAKPOINT = 700;
+const CONTENT_MAX_WIDTH = 760;
+
+export interface Layout {
+  width: number;
+  /** True on a tablet, and on a phone held sideways. */
+  isWide: boolean;
+  /** The widest a column of content should be allowed to get. */
+  contentMaxWidth: number;
+  /** How many cards fit side by side in a grid. */
+  columns: number;
+}
+
+export function useLayout(): Layout {
+  const { width } = useWindowDimensions();
+  const isWide = width >= WIDE_BREAKPOINT;
+  return {
+    width,
+    isWide,
+    contentMaxWidth: CONTENT_MAX_WIDTH,
+    columns: isWide ? 2 : 1,
+  };
 }

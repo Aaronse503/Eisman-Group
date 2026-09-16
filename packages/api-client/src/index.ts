@@ -60,6 +60,8 @@ export interface ApiClientOptions {
   onUnauthenticated?: () => void | Promise<void>;
   /** Milliseconds before a request is abandoned. */
   timeoutMs?: number;
+  /** Overrides the global fetch. Used by tests; the app leaves it unset. */
+  fetchImpl?: typeof fetch;
 }
 
 interface RequestOptions {
@@ -94,7 +96,8 @@ export class ApiClient {
 
     let response: Response;
     try {
-      response = await fetch(this.url(path, options.query), {
+      const send = this.options.fetchImpl ?? fetch;
+      response = await send(this.url(path, options.query), {
         method: options.method ?? 'GET',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),

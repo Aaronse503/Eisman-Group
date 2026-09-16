@@ -2,7 +2,7 @@ import * as React from 'react';
 import { AppState, Platform } from 'react-native';
 import * as Application from 'expo-application';
 import * as Device from 'expo-device';
-import type { ApiCompany, ApiUser, Permission, RoleGrant } from '@eisman/shared';
+import type { ApiCompany, ApiUser, Permission, PushCapability, RoleGrant } from '@eisman/shared';
 import { hasPermission } from '@eisman/shared';
 import { ApiClientError } from '@eisman/api-client';
 import { api, setUnauthenticatedHandler } from './api';
@@ -27,6 +27,7 @@ interface StoredProfile {
   grants: RoleGrant[];
   permissions: Permission[];
   demoMode: boolean;
+  push: PushCapability;
 }
 
 export interface SessionState {
@@ -36,6 +37,8 @@ export interface SessionState {
   permissions: Permission[];
   grants: RoleGrant[];
   demoMode: boolean;
+  /** Whether the server can push notifications at all. */
+  push: PushCapability;
   /** The active workspace: a company slug, or 'holdings' for everything. */
   scope: string;
   mustChangePassword: boolean;
@@ -78,6 +81,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     permissions: [],
     grants: [],
     demoMode: false,
+    push: { configured: false, reason: null },
     scope: 'holdings',
     mustChangePassword: false,
     queuedChanges: 0,
@@ -94,6 +98,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       permissions: profile.permissions,
       grants: profile.grants,
       demoMode: profile.demoMode,
+      // A profile cached by an older build may not carry this.
+      push: profile.push ?? { configured: false, reason: null },
       mustChangePassword: profile.user.mustChangePassword,
     }));
   }, []);
@@ -158,6 +164,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
           grants: session.grants,
           permissions: session.permissions,
           demoMode: session.demoMode,
+          push: session.push,
         };
         await writeJson(SESSION_KEY, profile);
         apply(profile, locked && !stored ? 'locked' : locked ? 'locked' : 'signedIn');
@@ -187,6 +194,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         grants: session.grants,
         permissions: session.permissions,
         demoMode: session.demoMode,
+        push: session.push,
       };
       await writeJson(SESSION_KEY, profile);
       apply(profile, 'signedIn');
@@ -210,6 +218,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         grants: session.grants,
         permissions: session.permissions,
         demoMode: session.demoMode,
+        push: session.push,
       };
       await writeJson(SESSION_KEY, profile);
       apply(profile, 'signedIn');

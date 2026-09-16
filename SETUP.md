@@ -34,6 +34,18 @@ irreplaceable:
 npm run db:nuke && npm run setup
 ```
 
+## On a phone
+
+With the web application running, in a second terminal:
+
+```bash
+EXPO_PUBLIC_API_URL=http://<your-lan-ip>:3000 npm run mobile
+```
+
+Scan the QR code with Expo Go. `localhost` on a phone means the phone, so a
+real device needs your machine's address on the network. `MOBILE.md` covers
+development builds, push notifications and what stays on the desktop.
+
 ## On a real Postgres
 
 Set `DATABASE_URL` and the same migrations run against it:
@@ -94,7 +106,7 @@ ignored by git and should stay that way.
 ## Checking your work
 
 ```bash
-npm run verify     # typecheck, lint, unit and integration tests
+npm run verify     # typecheck, lint, unit and integration tests, every workspace
 npm run test:e2e   # end-to-end, against a throwaway database of its own
 ```
 

@@ -7,6 +7,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, type ThemePreference, useTheme } from '@/theme';
 import { SessionProvider, useSession } from '@/lib/session';
 import { readJson, writeJson } from '@/lib/storage';
+import { useNotificationRouting } from '@/lib/notifications';
 import { Loading } from '@/components/ui';
 
 const THEME_KEY = 'eisman.theme.preference';
@@ -40,6 +41,9 @@ function useAuthGuard() {
 function Shell() {
   const theme = useTheme();
   const status = useAuthGuard();
+  // A tapped notification only opens a record once the person is past the
+  // lock screen; until then there is nothing they are allowed to see.
+  useNotificationRouting(status === 'signedIn');
 
   if (status === 'loading') {
     return (

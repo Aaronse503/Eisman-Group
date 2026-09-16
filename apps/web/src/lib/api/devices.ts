@@ -12,7 +12,7 @@ import { one, sql } from '@/lib/db/client';
 export async function registerDevice(userId: string, device: DeviceInfo): Promise<string> {
   const row = await one<{ id: string }>(
     `insert into devices (user_id, installation_id, platform, model, os_version, app_version)
-     values ($1,$2,$3,$4,$5,$6)
+     values ($1::uuid,$2::text,$3::text,$4::text,$5::text,$6::text)
      on conflict (user_id, installation_id) do update
        set platform = excluded.platform,
            model = excluded.model,
@@ -45,10 +45,10 @@ export async function setPushToken(
 ): Promise<void> {
   await sql(
     `update devices
-       set push_token = $3,
-           push_enabled = $3 is not null,
+       set push_token = $3::text,
+           push_enabled = $3::text is not null,
            last_seen_at = now()
-     where user_id = $1 and installation_id = $2`,
+     where user_id = $1::uuid and installation_id = $2::text`,
     [userId, installationId, pushToken],
   );
 }

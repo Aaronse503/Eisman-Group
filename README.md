@@ -5,7 +5,9 @@ work, money, people, partnerships, investors, documents and the ParFax
 platform, with a consolidated holdings view and a workspace per company.
 
 It ships with two companies — **Eisman Digital** and **ParFax** — and you can
-add more from the interface without touching the code.
+add more from the interface without touching the code. There is a web
+application and an iOS/Android app; both talk to the same server, the same
+database and the same permissions.
 
 ## Run it
 
@@ -14,6 +16,15 @@ npm install
 npm run setup     # creates the database, migrates it, loads demo data
 npm run dev       # http://localhost:3000
 ```
+
+For the phone, with the web application already running:
+
+```bash
+EXPO_PUBLIC_API_URL=http://<your-lan-ip>:3000 npm run mobile
+```
+
+`MOBILE.md` covers the mobile application — what is on it, what stays on the
+desktop, and how to make a build.
 
 There is nothing to provision. With no configuration the system runs on an
 embedded Postgres stored in `.data/pglite`, so `npm run setup` works on a
@@ -58,10 +69,14 @@ the differences are real, not cosmetic.
 
 ## How it is built
 
-Next.js 15 (App Router) and React 19 in TypeScript, Postgres, Tailwind CSS 4
-and Radix primitives. Server Components read; Server Actions write. The
-database is either embedded PGlite or any Postgres — one set of migrations,
-one set of SQL.
+A monorepo. `apps/web` is Next.js 15 (App Router) and React 19 in TypeScript,
+with Postgres, Tailwind CSS 4 and Radix primitives; Server Components read and
+Server Actions write. `apps/mobile` is Expo and React Native. `packages/shared`
+holds the types, validation schemas, permission rules and design tokens both
+use, and `packages/api-client` the typed client the phone talks through.
+
+The database is either embedded PGlite or any Postgres — one set of
+migrations, one set of SQL.
 
 `ARCHITECTURE.md` explains the structure and why it is shaped this way.
 
@@ -86,6 +101,12 @@ These are deliberate, and the tests enforce them:
 - **No sensitive payroll data.** No social security numbers, no bank details.
   The schema has nowhere to put them.
 - **No outbound email.** Investor outreach prepares drafts; nothing is sent.
+- **No notification claimed as delivered that was not.** A notification is
+  recorded in the database first; pushing it to a phone is a separate,
+  best-effort step, and every attempt is recorded with its outcome.
+- **No second database for the phone.** The mobile app reads and writes the
+  same rows under the same row-level security. Offline changes are queued on
+  the device with an id the server records, so a retry applies once.
 
 ## Documentation
 
@@ -97,12 +118,14 @@ These are deliberate, and the tests enforce them:
 | `INTEGRATIONS.md` | Every integration, what it needs, and what it does |
 | `SECURITY.md` | Authentication, permissions, encryption and the audit trail |
 | `DEPLOYMENT.md` | Hosting, backups and going live |
+| `MOBILE.md` | The iOS and Android app, and how to build it |
 | `USER_GUIDE.md` | Using the system, written for the people who will |
 
 ## Commands
 
 ```bash
-npm run dev            # development server
+npm run dev            # development server (web)
+npm run mobile         # the mobile app in Expo
 npm run build          # production build
 npm run start          # serve the production build
 npm run setup          # migrate and seed
@@ -112,7 +135,7 @@ npm run db:reset-demo  # clear and rebuild demo data
 npm run db:nuke        # delete the embedded database entirely
 npm run typecheck      # TypeScript
 npm run lint           # ESLint
-npm run test           # unit and integration tests
+npm run test           # unit and integration tests, every workspace
 npm run test:e2e       # end-to-end tests
 npm run verify         # typecheck, lint and test together
 ```

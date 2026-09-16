@@ -2,14 +2,33 @@
 
 ## The shape of it
 
-Next.js 15 App Router. Server Components read from Postgres directly; Server
-Actions write. There is no API layer between the two, because there is no
-second consumer — one application, one database, one set of types end to end.
+A monorepo with two applications and the code they share.
 
 ```
-src/
+apps/
+  web/                Next.js 15, the full system
+  mobile/             Expo + React Native, iOS and Android
+packages/
+  shared/             types, validation, permissions, formatting, design tokens
+  api-client/         the typed client both the app and the tests use
+db/migrations/        numbered SQL, applied in order, never edited after release
+```
+
+Everything in `packages/shared` is platform-free: no `next/*`, no
+`react-native`, no `pg`. It is imported unchanged by a Server Component, by a
+screen on a phone and by a test in Node, which is what keeps one set of rules
+from becoming two.
+
+### The web application
+
+Next.js 15 App Router. Server Components read from Postgres directly; Server
+Actions write.
+
+```
+apps/web/src/
   app/
     (app)/            every signed-in page; the layout here is the shell
+    api/v1/           the HTTP API the mobile application uses
     api/              the few things that must be HTTP: sign-in, health, files
     login/            the only page outside the shell
   components/
@@ -29,10 +48,24 @@ src/
     seed/             the core seed and the demo data
   server/
     actions/          every write, one module per area
-db/migrations/        numbered SQL, applied in order, never edited after release
 tests/                unit, integration and end-to-end
 scripts/              migrate, seed, reset, and development helpers
 ```
+
+### The API, and why there is one now
+
+There is a second consumer: the phone. `apps/web/src/app/api/v1` exists for it,
+and it is deliberately thin — an endpoint reads through the same query module
+and writes through the same Server Action the web pages use. It resolves the
+same session token, the same actor, the same permission checks and the same
+row-level security. The mobile application is a second way in, not a second
+set of rules.
+
+The session token travels as a bearer token instead of a cookie; everything
+else about it — expiry, revocation, rate limiting, the lock on a temporary
+password — is identical.
+
+`MOBILE.md` covers the mobile application itself.
 
 ## Two rules that shaped the layout
 

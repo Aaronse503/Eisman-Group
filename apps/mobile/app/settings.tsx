@@ -15,7 +15,7 @@ import { Body, Button, Card, Row, Screen, SectionTitle } from '@/components/ui';
 export default function SettingsScreen() {
   const theme = useTheme();
   const { preference, setPreference } = useThemePreference();
-  const { user, signOut, companies } = useSession();
+  const { user, signOut, companies, push } = useSession();
 
   const [biometricLabel, setBiometricLabel] = React.useState('device unlock');
   const [biometricAvailable, setBiometricAvailable] = React.useState(false);
@@ -36,6 +36,12 @@ export default function SettingsScreen() {
   const togglePush = async (next: boolean) => {
     setBusy(true);
     setPushNote(null);
+    if (next && !push.configured) {
+      setPushEnabled(false);
+      setPushNote(push.reason ?? 'This server is not set up to send push notifications.');
+      setBusy(false);
+      return;
+    }
     try {
       if (next) {
         const result = await registerForPush();
@@ -91,11 +97,18 @@ export default function SettingsScreen() {
           </View>
           <Switch
             value={pushEnabled}
-            disabled={busy}
+            disabled={busy || !push.configured}
             onValueChange={(next) => void togglePush(next)}
             accessibilityLabel="Push notifications"
           />
         </Row>
+        {!push.configured ? (
+          <Body size="sm" muted style={{ marginTop: theme.spacing.sm }}>
+            {push.reason ??
+              'This server is not set up to send push notifications. They are still recorded and ' +
+                'shown in the app.'}
+          </Body>
+        ) : null}
         {pushNote ? (
           <Body size="sm" muted style={{ marginTop: theme.spacing.sm }}>
             {pushNote}

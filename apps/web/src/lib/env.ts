@@ -46,6 +46,16 @@ const schema = z.object({
   PARFAX_API_BASE: z.string().optional(),
   PARFAX_API_KEY: z.string().optional(),
 
+  /**
+   * Push delivery. `expo` hands notifications to Expo's push service, which
+   * needs no credential of its own — but a device only ever has a token when
+   * the mobile build was made from an EAS project with APNs/FCM credentials.
+   * Set to `none` to record notifications without pushing them anywhere.
+   */
+  PUSH_PROVIDER: z.enum(['expo', 'none']).default('expo'),
+  /** Only needed if the Expo project requires an access token to send. */
+  EXPO_ACCESS_TOKEN: z.string().optional(),
+
   ANTHROPIC_API_KEY: z.string().optional(),
   ANTHROPIC_MODEL: z.string().default('claude-sonnet-5'),
   AI_PROVIDER: z.enum(['anthropic', 'local']).default('local'),

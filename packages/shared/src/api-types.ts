@@ -66,6 +66,15 @@ export interface SessionResponse {
   permissions: Permission[];
   /** True when this deployment is showing demo data. */
   demoMode: boolean;
+  /** Whether this server can actually push notifications to a device. */
+  push: PushCapability;
+}
+
+export interface PushCapability {
+  /** False means notifications are recorded but never pushed anywhere. */
+  configured: boolean;
+  /** Why it is not configured, worth showing rather than hiding. */
+  reason: string | null;
 }
 
 export interface SignInRequest {

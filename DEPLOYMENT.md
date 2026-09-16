@@ -25,6 +25,7 @@ The least work. Roughly **$20–45 a month** for a small team.
    ENCRYPTION_KEY=       # openssl rand -base64 32, exactly 32 bytes
    DEMO_MODE=false
    DISABLE_DEMO_DATA=true
+   CRON_SECRET=          # openssl rand -base64 32; see "Reminders" below
    ```
 
    Add integration credentials only as you connect each one.
@@ -59,6 +60,53 @@ make sure it sets `X-Forwarded-Proto`, which is how the session cookie decides
 whether to be `Secure`.
 
 A single container with a Postgres alongside is enough for a team of this size.
+
+## Reminders and notifications
+
+Two things run on a schedule rather than on a request.
+
+**Reminders.** A reminder is a row until something turns it into a
+notification. `POST /api/v1/cron/reminders` does that for everything that has
+come due. It authenticates with `CRON_SECRET` as a bearer token, and with no
+secret configured it refuses to run at all rather than leaving an endpoint
+open that writes notifications to other people.
+
+On Vercel, add to `vercel.json`:
+
+```json
+{ "crons": [{ "path": "/api/v1/cron/reminders", "schedule": "*/15 * * * *" }] }
+```
+
+Vercel's own cron sends the secret it is configured with; on any other host,
+a systemd timer or a crontab line is enough:
+
+```
+*/15 * * * * curl -fsS -X POST -H "Authorization: Bearer $CRON_SECRET" \
+  https://your-domain/api/v1/cron/reminders > /dev/null
+```
+
+Running it more than once at the same moment is safe: a reminder is marked
+sent only after its notification exists, and the second run finds nothing due.
+
+**Push delivery.** `PUSH_PROVIDER` defaults to `expo`. Notifications are
+always recorded in the database; pushing them to a phone additionally needs
+the Expo project and the APNs/FCM credentials described in `MOBILE.md`. Set
+`PUSH_PROVIDER=none` to record notifications without pushing them anywhere —
+the mobile app then says so on its Settings screen instead of offering a
+toggle that does nothing. Every delivery attempt is recorded in
+`push_deliveries` with its outcome.
+
+## The mobile application
+
+The phone talks to the same deployment over HTTPS. Two things to set:
+
+- `APP_URL` on the server, so links in notifications resolve.
+- `EXPO_PUBLIC_API_URL` in the EAS build profile (`apps/mobile/eas.json`),
+  pointing at the same domain. It is baked into the build, so changing the
+  domain means a new build.
+
+Builds go through EAS and are distributed internally. Nothing is submitted to
+the App Store or Google Play. See `MOBILE.md`.
 
 ## Do not deploy the embedded database
 

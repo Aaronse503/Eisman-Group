@@ -20,6 +20,7 @@ file.
 | `0007_rls.sql` | Row-level security policies and helper functions |
 | `0008_app_role.sql` | The unprivileged `app_user` role those policies apply to |
 | `0009_more_providers.sql` | Additional integration providers |
+| `0010_mobile.sql` | Devices, queued offline changes, push delivery attempts |
 
 ```bash
 npm run db:migrate      # apply outstanding migrations
@@ -40,6 +41,11 @@ what lets you add a company later without touching the schema.
 
 A few things are deliberately holdings-level, with a null `company_id`:
 investors, and holdings-wide role grants.
+
+Three tables belong to a **person** rather than a company — `devices`,
+`client_mutations` and `push_deliveries` — and their policies say so: you see
+your own devices and your own queued changes, and nobody else's. There is no
+company dimension to them, because a phone is not owned by a company.
 
 ### Conventions
 
@@ -112,6 +118,25 @@ is reported as a conflict instead of being overwritten.
 company and a generated `tsvector`.
 
 **Audit** — `audit_log`. Append-only: triggers raise on UPDATE and DELETE.
+
+**Mobile** — `devices`, `client_mutations`, `push_deliveries`.
+
+`devices` is keyed on a `(user_id, installation_id)` pair, where the
+installation id is generated once by the app and kept in the device's secure
+storage. Reinstalling produces a new row rather than silently inheriting the
+old one's notification settings. `push_token` is null until the person allows
+notifications, so storing one is also what turns delivery on.
+
+`client_mutations` is the record of changes made with no connection. Its
+primary key is the `client_id` the *device* generated, which is what makes a
+retry after a lost response apply the change once: the second attempt finds
+the row and returns the same answer instead of creating a second record.
+
+`push_deliveries` records each attempt to reach a device — `queued`, `sent`,
+`failed` or `rejected`, with the push service's ticket or its error. A
+notification that never arrived can therefore be told apart from one that was
+never sent. No row at all means no attempt was made, which is what happens
+when nobody has notifications turned on.
 
 ## Row-level security
 

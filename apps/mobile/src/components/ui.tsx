@@ -13,7 +13,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme, type Theme } from '@/theme';
+import { useLayout, useTheme, type Theme } from '@/theme';
 
 /**
  * The building blocks of the mobile interface.
@@ -34,12 +34,28 @@ export function Screen({
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useTheme();
+  const layout = useLayout();
   const base: ViewStyle = { flex: 1, backgroundColor: theme.colors.bg };
-  if (!scroll) return <View style={[base, style]}>{children}</View>;
+  // On a tablet the content is centred in a column rather than stretched the
+  // full width, where a line of text becomes hard to follow.
+  const column: ViewStyle = layout.isWide
+    ? { width: '100%', maxWidth: layout.contentMaxWidth, alignSelf: 'center' }
+    : {};
+  if (!scroll) {
+    return (
+      <View style={base}>
+        <View style={[{ flex: 1 }, column, style]}>{children}</View>
+      </View>
+    );
+  }
   return (
     <ScrollView
       style={base}
-      contentContainerStyle={[{ padding: theme.spacing.lg, paddingBottom: 48 }, style]}
+      contentContainerStyle={[
+        { padding: theme.spacing.lg, paddingBottom: 48 },
+        column,
+        style,
+      ]}
       refreshControl={refreshControl}
       keyboardShouldPersistTaps="handled"
     >

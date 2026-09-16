@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { sql, one } from '@/lib/db/client';
 import { requireActor, requireCompanyAccess, ForbiddenError } from '@/lib/auth/actor';
 import { recordActivity } from '@/lib/activity';
+import { notifyUser } from '@/lib/notify';
 import { fieldErrors, type ActionResult } from '@/lib/validation/schemas';
 import { quickTaskSchema, taskSchema } from '@/lib/validation/tasks';
 import { TASK_STATUSES, nextOccurrence } from '@/lib/domain/tasks';
@@ -73,11 +74,16 @@ export async function createTaskAction(input: unknown): Promise<ActionResult<{ i
     );
 
     if (data.assigneeUserId && data.assigneeUserId !== actor.user.id) {
-      await sql(
-        `insert into notifications (user_id, company_id, kind, title, body, entity_type, entity_id, href)
-         values ($1,$2,'assignment','New task assigned to you',$3,'task',$4,$5)`,
-        [data.assigneeUserId, data.companyId, data.title, row!.id, `/tasks/${row!.id}`],
-      );
+      await notifyUser({
+        userId: data.assigneeUserId,
+        companyId: data.companyId,
+        kind: 'assignment',
+        title: 'New task assigned to you',
+        body: data.title,
+        entityType: 'task',
+        entityId: row!.id,
+        href: `/tasks/${row!.id}`,
+      });
     }
 
     await recordActivity({
@@ -124,11 +130,16 @@ export async function updateTaskAction(id: string, input: unknown): Promise<Acti
 
     if (data.assigneeUserId && data.assigneeUserId !== task.assignee_user_id && data.assigneeUserId !== actor.user.id) {
       await sql(`update tasks set delegated_by_id = $2 where id = $1`, [id, actor.user.id]);
-      await sql(
-        `insert into notifications (user_id, company_id, kind, title, body, entity_type, entity_id, href)
-         values ($1,$2,'assignment','Task assigned to you',$3,'task',$4,$5)`,
-        [data.assigneeUserId, task.company_id, data.title, id, `/tasks/${id}`],
-      );
+      await notifyUser({
+        userId: data.assigneeUserId,
+        companyId: task.company_id,
+        kind: 'assignment',
+        title: 'Task assigned to you',
+        body: data.title,
+        entityType: 'task',
+        entityId: id,
+        href: `/tasks/${id}`,
+      });
     }
 
     await recordActivity({
@@ -222,11 +233,16 @@ export async function assignTaskAction(id: string, userId: string | null): Promi
       [id, userId, userId && userId !== actor.user.id ? actor.user.id : null],
     );
     if (userId && userId !== actor.user.id) {
-      await sql(
-        `insert into notifications (user_id, company_id, kind, title, body, entity_type, entity_id, href)
-         values ($1,$2,'assignment','Task assigned to you',$3,'task',$4,$5)`,
-        [userId, task.company_id, task.title, id, `/tasks/${id}`],
-      );
+      await notifyUser({
+        userId,
+        companyId: task.company_id,
+        kind: 'assignment',
+        title: 'Task assigned to you',
+        body: task.title,
+        entityType: 'task',
+        entityId: id,
+        href: `/tasks/${id}`,
+      });
     }
     await recordActivity({
       actor, companyId: task.company_id, entityType: 'task', entityId: id,
