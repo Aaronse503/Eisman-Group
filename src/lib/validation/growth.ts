@@ -7,7 +7,7 @@ import {
 
 const csv = z
   .union([z.string(), z.array(z.string())])
-  .optional()
+  .nullish()
   .transform((v) => {
     const items = Array.isArray(v) ? v : (v ?? '').split(',');
     return [...new Set(items.map((s) => s.trim()).filter(Boolean))].slice(0, 30);
@@ -41,11 +41,11 @@ export const investorSchema = z.object({
   investorType: z.enum(INVESTOR_TYPES).default('vc'),
   checkSizeMin: z
     .union([z.string(), z.number()])
-    .optional()
+    .nullish()
     .transform((v) => (v === '' || v === undefined || v === null ? null : Number(v))),
   checkSizeMax: z
     .union([z.string(), z.number()])
-    .optional()
+    .nullish()
     .transform((v) => (v === '' || v === undefined || v === null ? null : Number(v))),
   currency: z.string().trim().length(3).toUpperCase().default('USD'),
   stagePreferences: csv,

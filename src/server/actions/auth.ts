@@ -1,64 +1,10 @@
 'use server';
-import { cookies } from 'next/headers';
 import { z } from 'zod';
-import { authenticate, AuthError, SESSION_COOKIE, setPassword } from '@/lib/auth/session';
-import { requestInfo, requireActor } from '@/lib/auth/actor';
+import { setPassword, revokeAllSessionsForUser } from '@/lib/auth/session';
+import { requireActor } from '@/lib/auth/actor';
 import { recordAudit } from '@/lib/audit';
-import { getEnv } from '@/lib/env';
 import { verifyPassword } from '@/lib/crypto';
 import { one } from '@/lib/db/client';
-import { revokeAllSessionsForUser } from '@/lib/auth/session';
-
-const signInSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
-});
-
-export async function signInAction(input: z.infer<typeof signInSchema>) {
-  const parsed = signInSchema.safeParse(input);
-  if (!parsed.success) return { ok: false as const, error: 'Enter a valid email and password.' };
-
-  const info = await requestInfo();
-  try {
-    const { token, expiresAt, user } = await authenticate(
-      parsed.data.email,
-      parsed.data.password,
-      info,
-    );
-    (await cookies()).set(SESSION_COOKIE, token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: getEnv().NODE_ENV === 'production',
-      path: '/',
-      expires: expiresAt,
-    });
-    await recordAudit({
-      actor: { user },
-      action: 'auth.sign_in',
-      entityType: 'user',
-      entityId: user.id,
-      entityLabel: user.email,
-      ip: info.ip,
-      userAgent: info.userAgent,
-    });
-    return { ok: true as const };
-  } catch (err) {
-    if (err instanceof AuthError) {
-      await recordAudit({
-        actor: null,
-        action: 'auth.sign_in_failed',
-        entityType: 'user',
-        entityLabel: parsed.data.email,
-        reason: err.code,
-        severity: 'warning',
-        ip: info.ip,
-        userAgent: info.userAgent,
-      });
-      return { ok: false as const, error: err.message };
-    }
-    throw err;
-  }
-}
 
 const changePasswordSchema = z
   .object({

@@ -29,10 +29,10 @@ export default async function ProfilePage() {
       {detail?.must_change_password ? (
         <Card className="border-[var(--warning)]/40">
           <CardContent className="py-4 text-sm">
-            <p className="font-medium">Change your password</p>
+            <p className="font-medium">Choose a password to continue</p>
             <p className="text-[var(--fg-muted)]">
-              This account still uses its initial password. Set a new one below before you use the
-              system for real work.
+              This account is still on its temporary password. Set your own below — the rest of the
+              system stays locked until you do.
             </p>
           </CardContent>
         </Card>

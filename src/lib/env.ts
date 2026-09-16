@@ -61,6 +61,14 @@ const schema = z.object({
     .default('false')
     .transform((v) => v === 'true'),
 
+  /**
+   * Sign-in attempt budgets, per fifteen minutes. The defaults are the ones a
+   * deployment should keep; they are configurable so an automated test run can
+   * raise them without the application shipping a weaker limit.
+   */
+  LOGIN_ATTEMPTS_PER_IP: z.coerce.number().int().positive().default(20),
+  LOGIN_ATTEMPTS_PER_EMAIL: z.coerce.number().int().positive().default(8),
+
   CRON_SECRET: z.string().optional(),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
 });

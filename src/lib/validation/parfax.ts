@@ -18,8 +18,8 @@ export const parfaxMetricSchema = z.object({
   periodStart: z.string().min(1, 'Choose a start date'),
   periodEnd: z.string().min(1, 'Choose an end date'),
   value: z.coerce.number(),
-  unit: z.string().trim().max(30).optional(),
+  unit: z.string().trim().max(30).nullish(),
   kind: z.enum(OPERATOR_METRIC_KINDS),
   sourceLabel: z.string().trim().min(4, 'Say where this number came from'),
-  note: z.string().trim().max(1000).optional(),
+  note: z.string().trim().max(1000).nullish(),
 });

@@ -30,7 +30,7 @@ export default async function ParfaxSupportPage() {
       />
       <ParfaxNav />
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatCard label="Open" value={formatNumber(open.length)} tone={open.length > 10 ? 'warning' : 'default'} />
         <StatCard label="High or urgent" value={formatNumber(urgent.length)} tone={urgent.length > 0 ? 'danger' : 'success'} />
         <StatCard label="Resolved" value={formatNumber(issues.filter((i) => i.status === 'resolved').length)} />

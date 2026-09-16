@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,7 +8,6 @@ import { AlertTriangle, LogIn, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/misc';
-import { signInAction } from '@/server/actions/auth';
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Enter a valid email address'),
@@ -24,8 +23,14 @@ export function LoginForm({
   demoUsers: { email: string; name: string; title: string | null }[];
   noUsers: boolean;
 }) {
-  const router = useRouter();
+  const searchParams = useSearchParams();
   const [serverError, setServerError] = React.useState<string | null>(null);
+
+  // Return to whatever was originally asked for. Only a path within this
+  // application is accepted, so the parameter cannot be used to bounce
+  // somebody to another site after they sign in.
+  const requested = searchParams.get('next');
+  const destination = requested && /^\/(?!\/)/.test(requested) ? requested : '/';
   const {
     register,
     handleSubmit,
@@ -35,13 +40,21 @@ export function LoginForm({
 
   const onSubmit = handleSubmit(async (values) => {
     setServerError(null);
-    const result = await signInAction(values);
-    if (result.ok) {
-      router.push('/');
-      router.refresh();
-    } else {
-      setServerError(result.error);
+    // Posted to the route handler rather than through a Server Action: the
+    // response is an ordinary one, so the session cookie is stored before this
+    // promise resolves and the navigation that follows always carries it.
+    const response = await fetch('/api/auth/sign-in', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+    if (response.ok) {
+      // A full load, so the whole tree renders for the newly signed-in person.
+      window.location.assign(destination);
+      return;
     }
+    const body = (await response.json().catch(() => null)) as { error?: string } | null;
+    setServerError(body?.error ?? 'Could not sign in. Try again.');
   });
 
   if (noUsers) {

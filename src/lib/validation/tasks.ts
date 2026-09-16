@@ -17,7 +17,7 @@ export const taskSchema = z.object({
   dueAt: optionalDateTime,
   estimateHours: z
     .union([z.string(), z.number()])
-    .optional()
+    .nullish()
     .transform((v) => {
       if (v === '' || v === undefined || v === null) return null;
       const n = Number(v);

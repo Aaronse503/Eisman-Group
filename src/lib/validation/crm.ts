@@ -24,7 +24,7 @@ export const clientSchema = z.object({
   instagram: optionalUrl,
   services: z
     .union([z.string(), z.array(z.string())])
-    .optional()
+    .nullish()
     .transform((v) => {
       const items = Array.isArray(v) ? v : (v ?? '').split(',');
       return [...new Set(items.map((s) => s.trim()).filter(Boolean))].slice(0, 20);
@@ -49,7 +49,7 @@ export const contactSchema = z.object({
   companyId: z.string().uuid('Choose a company'),
   organizationId: optionalUuid,
   firstName: z.string().trim().min(1, 'First name is required').max(80),
-  lastName: z.string().trim().max(80).optional().transform((v) => v || null),
+  lastName: z.string().trim().max(80).nullish().transform((v) => v || null),
   email: optionalEmail,
   secondaryEmail: optionalEmail,
   phone: optionalString,
@@ -63,7 +63,7 @@ export const contactSchema = z.object({
   ownerUserId: optionalUuid,
   roles: z
     .union([z.string(), z.array(z.string())])
-    .optional()
+    .nullish()
     .transform((v) => {
       const items = Array.isArray(v) ? v : (v ?? '').split(',');
       return items
@@ -91,7 +91,7 @@ export const organizationSchema = z.object({
   ownerUserId: optionalUuid,
   roles: z
     .union([z.string(), z.array(z.string())])
-    .optional()
+    .nullish()
     .transform((v) => {
       const items = Array.isArray(v) ? v : (v ?? '').split(',');
       return items

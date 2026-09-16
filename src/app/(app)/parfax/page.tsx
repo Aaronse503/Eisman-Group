@@ -74,7 +74,7 @@ export default async function ParfaxPage({
         <h2 className="mb-3 text-sm font-semibold tracking-wide text-[var(--fg-muted)] uppercase">
           Users
         </h2>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">
           <StatCard label="Registered users" value={formatNumber(overview.totalUsers)} href="/parfax/users" />
           <StatCard
             label="New in period"
@@ -107,7 +107,7 @@ export default async function ParfaxPage({
         <h2 className="mb-3 text-sm font-semibold tracking-wide text-[var(--fg-muted)] uppercase">
           Subscriptions
         </h2>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">
           <StatCard
             label="MRR"
             value={formatCurrency(overview.mrr)}
@@ -139,7 +139,7 @@ export default async function ParfaxPage({
         <h2 className="mb-3 text-sm font-semibold tracking-wide text-[var(--fg-muted)] uppercase">
           Platform
         </h2>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">
           <StatCard label="Scans in period" value={formatNumber(overview.scansInPeriod)} hint={`${formatNumber(overview.totalScans)} all time`} />
           <StatCard
             label="Scan accuracy"

@@ -63,7 +63,7 @@ export default async function CrmPage({ searchParams }: { searchParams: SearchPa
 
       <CrmNav active="clients" scopeSlug={scope.slug} />
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatCard label="Active clients" value={formatNumber(active.length)} />
         <StatCard
           label="Monthly retainer"

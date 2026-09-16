@@ -40,7 +40,7 @@ export function StatCard({
   const body = (
     <div
       className={cn(
-        'group flex h-full flex-col gap-2 rounded-[var(--radius-card)] border bg-[var(--surface)] p-4 shadow-[var(--shadow-card)] transition-colors',
+        'group flex h-full flex-col gap-2 rounded-[var(--radius-card)] border bg-[var(--surface)] p-3.5 shadow-[var(--shadow-card)] transition-colors sm:p-4',
         tone === 'default' && 'border-[var(--border)]',
         tone === 'warning' && 'border-[var(--warning)]/35',
         tone === 'danger' && 'border-[var(--danger)]/35',
@@ -58,7 +58,7 @@ export function StatCard({
         ) : null}
       </div>
       <div className="space-y-1">
-        <p className="tnum text-2xl leading-tight font-semibold tracking-tight">{value}</p>
+        <p className="tnum text-xl leading-tight font-semibold tracking-tight sm:text-2xl">{value}</p>
         {hasDelta ? (
           <p className="flex items-center gap-1 text-xs">
             <span

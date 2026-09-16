@@ -5,7 +5,12 @@ export type ProviderId =
   | 'google_calendar'
   | 'parfax_crm'
   | 'anthropic'
-  | 'email';
+  | 'email'
+  | 'slack'
+  | 'notion'
+  | 'metricool'
+  | 'otter'
+  | 'linkedin';
 
 export interface ProviderCredentialField {
   key: string;
@@ -194,7 +199,7 @@ export const PROVIDERS: ProviderDefinition[] = [
   },
   {
     id: 'email',
-    name: 'Email provider',
+    name: 'Resend (email)',
     tagline: 'Outbound sending for investor and partnership sequences.',
     category: 'comms',
     scope: 'holding',
@@ -206,11 +211,100 @@ export const PROVIDERS: ProviderDefinition[] = [
     supportsDemo: false,
     setupSteps: [
       'Not implemented. Message templates and drafts exist today, and nothing is sent automatically.',
-      'When an email provider is added, sending will require explicit per-message approval.',
+      'When sending is added it will use Resend, and every message will need explicit approval before it goes out.',
     ],
     status: 'planned',
     plannedNote:
       'Planned. Drafting and templates work today; no sending integration is connected, and no message leaves this system.',
+  },
+  {
+    id: 'slack',
+    name: 'Slack',
+    tagline: 'Notifications into a channel, and saving a thread as a note.',
+    category: 'comms',
+    scope: 'company',
+    authType: 'oauth',
+    credentialFields: [],
+    requestedScopes: [],
+    syncs: [],
+    writeCapable: true,
+    supportsDemo: false,
+    setupSteps: [
+      'Not implemented. Notifications currently appear in this system only.',
+    ],
+    status: 'planned',
+    plannedNote: 'Planned. Nothing is posted to Slack and no Slack data is read.',
+  },
+  {
+    id: 'notion',
+    name: 'Notion',
+    tagline: 'Import existing pages and databases into the Knowledge Hub.',
+    category: 'work',
+    scope: 'company',
+    authType: 'api_key',
+    credentialFields: [],
+    requestedScopes: [],
+    syncs: [],
+    writeCapable: false,
+    supportsDemo: false,
+    setupSteps: [
+      'Not implemented. Notion pages can be exported to CSV or Markdown and brought in through Import data.',
+    ],
+    status: 'planned',
+    plannedNote: 'Planned. Use Settings → Import data for Notion exports in the meantime.',
+  },
+  {
+    id: 'metricool',
+    name: 'Metricool',
+    tagline: 'Social and campaign performance alongside client health.',
+    category: 'product',
+    scope: 'company',
+    authType: 'api_key',
+    credentialFields: [],
+    requestedScopes: [],
+    syncs: [],
+    writeCapable: false,
+    supportsDemo: false,
+    setupSteps: ['Not implemented. No Metricool data is read or displayed.'],
+    status: 'planned',
+    plannedNote: 'Planned. Campaign figures shown today come only from records in this system.',
+  },
+  {
+    id: 'otter',
+    name: 'Otter',
+    tagline: 'Meeting transcripts into meeting notes and action items.',
+    category: 'work',
+    scope: 'company',
+    authType: 'api_key',
+    credentialFields: [],
+    requestedScopes: [],
+    syncs: [],
+    writeCapable: false,
+    supportsDemo: false,
+    setupSteps: [
+      'Not implemented. A transcript can be uploaded to the Knowledge Hub today and is indexed like any other document.',
+    ],
+    status: 'planned',
+    plannedNote: 'Planned. Upload transcripts under Knowledge Hub in the meantime.',
+  },
+  {
+    id: 'linkedin',
+    name: 'LinkedIn',
+    tagline: 'Contact and company enrichment for the CRM and investor list.',
+    category: 'work',
+    scope: 'holding',
+    authType: 'oauth',
+    credentialFields: [],
+    requestedScopes: [],
+    syncs: [],
+    writeCapable: false,
+    supportsDemo: false,
+    setupSteps: [
+      'Not implemented. LinkedIn profile URLs are stored on contacts and investors and are entered by hand.',
+    ],
+    status: 'planned',
+    plannedNote:
+      'Planned, and limited by what LinkedIn permits: their API does not allow general profile lookup.',
   },
 ];
 

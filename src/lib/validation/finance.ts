@@ -44,7 +44,7 @@ export const expenseSchema = z.object({
   clientId: optionalUuid,
   recurring: z
     .string()
-    .optional()
+    .nullish()
     .transform((v) => (v === 'monthly' || v === 'quarterly' || v === 'annual' ? v : null)),
 });
 

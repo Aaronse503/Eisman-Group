@@ -2,7 +2,7 @@
   "name": "eisman-command-center",
   "version": "1.0.0",
   "private": true,
-  "description": "Eisman Holdings Command Center — internal multi-company business operating system.",
+  "description": "Eisman Holdings Command Center \u2014 internal multi-company business operating system.",
   "engines": {
     "node": ">=20.9.0"
   },
@@ -20,7 +20,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "verify": "npm run typecheck && npm run lint && npm run test"
+    "verify": "npm run typecheck && npm run lint && npm run test",
+    "e2e:server": "bash scripts/dev/e2e-server.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",

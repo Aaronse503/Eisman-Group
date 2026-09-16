@@ -109,7 +109,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         they simply do not compete with the headlines for attention.
       */}
       <section className="mb-6" aria-label="At a glance">
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
           {canSeeFinance ? (
             <StatCard
               label="Revenue"

@@ -185,8 +185,9 @@ export async function authenticate(
   await ensureMigrated();
   const normalized = email.trim().toLowerCase();
 
-  const ipOk = await consumeRateLimit(`login:ip:${info.ip ?? 'unknown'}`, 20, 900);
-  const emailOk = await consumeRateLimit(`login:email:${normalized}`, 8, 900);
+  const env = getEnv();
+  const ipOk = await consumeRateLimit(`login:ip:${info.ip ?? 'unknown'}`, env.LOGIN_ATTEMPTS_PER_IP, 900);
+  const emailOk = await consumeRateLimit(`login:email:${normalized}`, env.LOGIN_ATTEMPTS_PER_EMAIL, 900);
   if (!ipOk || !emailOk) {
     throw new AuthError('Too many sign-in attempts. Try again in a few minutes.', 'rate_limited');
   }

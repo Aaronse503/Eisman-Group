@@ -16,7 +16,7 @@ export const memberSchema = z.object({
   employmentType: z.enum(['full_time', 'part_time', 'contract', 'hourly', 'project']).default('full_time'),
   payRate: z
     .union([z.string(), z.number()])
-    .optional()
+    .nullish()
     .transform((v) => {
       if (v === '' || v === undefined || v === null) return null;
       const n = Number(v);
@@ -24,11 +24,11 @@ export const memberSchema = z.object({
     }),
   payRateUnit: z
     .string()
-    .optional()
+    .nullish()
     .transform((v) => (['hour', 'day', 'month', 'year', 'project'].includes(v ?? '') ? v! : null)),
   paySchedule: z
     .string()
-    .optional()
+    .nullish()
     .transform((v) =>
       ['weekly', 'biweekly', 'semimonthly', 'monthly', 'on_invoice'].includes(v ?? '') ? v! : null,
     ),
@@ -38,7 +38,7 @@ export const memberSchema = z.object({
   status: z.enum(['active', 'on_leave', 'offboarding', 'inactive']).default('active'),
   skills: z
     .union([z.string(), z.array(z.string())])
-    .optional()
+    .nullish()
     .transform((v) => {
       const items = Array.isArray(v) ? v : (v ?? '').split(',');
       return [...new Set(items.map((s) => s.trim()).filter(Boolean))].slice(0, 30);

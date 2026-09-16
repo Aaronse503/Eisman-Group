@@ -9,6 +9,7 @@ import { ROLE_LABELS } from '@/lib/rbac/permissions';
 import { Sidebar } from '@/components/shell/sidebar';
 import { Topbar, type NotificationItem } from '@/components/shell/topbar';
 import { CommandPalette, type RecentItem } from '@/components/shell/command-palette';
+import { MustChangePassword } from './must-change-password';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +28,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   await ensureMigrated();
   const actor = await getActor();
   if (!actor) redirect('/login');
+
+  // A temporary password has to be replaced before the system can be used.
+  // This renders instead of the application rather than redirecting to it, so
+  // there is no route that slips past and no redirect for the router to chase.
+  if (actor.user.must_change_password) {
+    return <MustChangePassword name={actor.user.name} email={actor.user.email} />;
+  }
 
   const scope = await getScope(actor);
   const env = getEnv();

@@ -1,15 +1,29 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 import { authenticate, AuthError, SESSION_COOKIE } from '@/lib/auth/session';
-import { getEnv } from '@/lib/env';
 import { recordAudit } from '@/lib/audit';
 
 const schema = z.object({ email: z.string().email(), password: z.string().min(1) });
 
 /**
- * Programmatic sign-in, used by the end-to-end tests and the smoke script.
- * It is the same code path as the UI action, including rate limiting.
+ * Sign-in. The browser form posts here, as do the end-to-end tests and the
+ * smoke script, so there is one code path including the rate limiting.
  */
+
+/**
+ * Whether the session cookie should be marked Secure.
+ *
+ * Taken from the protocol the request actually arrived on — via
+ * x-forwarded-proto when a proxy terminated TLS — rather than from NODE_ENV.
+ * A production deployment is served over HTTPS and gets a Secure cookie; a
+ * production build served over plain HTTP locally still works, instead of
+ * silently handing out a cookie the browser will refuse to keep.
+ */
+export function isSecureRequest(request: NextRequest): boolean {
+  const forwarded = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim();
+  if (forwarded) return forwarded === 'https';
+  return request.nextUrl.protocol === 'https:';
+}
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const parsed = schema.safeParse(body);
@@ -40,7 +54,7 @@ export async function POST(request: NextRequest) {
     response.cookies.set(SESSION_COOKIE, token, {
       httpOnly: true,
       sameSite: 'lax',
-      secure: getEnv().NODE_ENV === 'production',
+      secure: isSecureRequest(request),
       path: '/',
       expires: expiresAt,
     });

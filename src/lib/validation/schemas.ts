@@ -1,18 +1,24 @@
 import { z } from 'zod';
 
-/** Shared field primitives so validation reads the same everywhere. */
+/**
+ * Shared field primitives so validation reads the same everywhere.
+ *
+ * Every optional field accepts null as well as undefined. A cleared input or an
+ * unselected dropdown submits null, and rejecting it produced a raw
+ * "Expected string, received null" in front of the person filling in the form.
+ */
 export const optionalString = z
   .string()
   .trim()
   .max(4000)
-  .optional()
+  .nullish()
   .transform((v) => (v ? v : null));
 
 export const optionalUrl = z
   .string()
   .trim()
   .max(500)
-  .optional()
+  .nullish()
   .refine((v) => !v || /^https?:\/\/.+/i.test(v), 'Enter a full URL starting with http:// or https://')
   .transform((v) => (v ? v : null));
 
@@ -20,21 +26,21 @@ export const optionalEmail = z
   .string()
   .trim()
   .max(320)
-  .optional()
+  .nullish()
   .refine((v) => !v || z.string().email().safeParse(v).success, 'Enter a valid email address')
   .transform((v) => (v ? v.toLowerCase() : null));
 
 export const optionalDate = z
   .string()
   .trim()
-  .optional()
+  .nullish()
   .refine((v) => !v || /^\d{4}-\d{2}-\d{2}$/.test(v), 'Use the date picker')
   .transform((v) => (v ? v : null));
 
 export const optionalDateTime = z
   .string()
   .trim()
-  .optional()
+  .nullish()
   .transform((v) => (v ? new Date(v) : null))
   .refine((v) => v === null || !Number.isNaN(v.getTime()), 'Enter a valid date and time');
 
@@ -44,13 +50,13 @@ export const percent = z.coerce.number().int().min(0).max(100);
 
 export const optionalUuid = z
   .string()
-  .optional()
+  .nullish()
   .transform((v) => (v && v !== 'none' && v !== '' ? v : null))
   .refine((v) => v === null || z.string().uuid().safeParse(v).success, 'Invalid selection');
 
 export const tagList = z
   .union([z.string(), z.array(z.string())])
-  .optional()
+  .nullish()
   .transform((v) => {
     if (!v) return [];
     const items = Array.isArray(v) ? v : v.split(',');
