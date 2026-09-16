@@ -11,9 +11,11 @@
     "packages/*"
   ],
   "scripts": {
+    "start": "node scripts/start.mjs",
+    "start:web": "node scripts/start.mjs --no-phone",
     "dev": "npm run dev --workspace @eisman/web",
     "build": "npm run build --workspace @eisman/web",
-    "start": "npm run start --workspace @eisman/web",
+    "start:production": "npm run start --workspace @eisman/web",
     "mobile": "npm run start --workspace @eisman/mobile",
     "db:migrate": "npm run db:migrate --workspace @eisman/web",
     "db:seed": "npm run db:seed --workspace @eisman/web",

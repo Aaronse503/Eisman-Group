@@ -36,14 +36,23 @@ the web application where one of them is the next step.
 
 ```bash
 npm install
-npm run dev                      # the API the app talks to, on :3000
+npm start
+```
+
+That starts the server the app talks to and the app itself, with the app
+already pointed at this machine's address on the network. Scan the QR code it
+prints with **Expo Go** (free, from either store), or open it in a development
+build.
+
+`localhost` is the phone itself, so a device on your network needs your
+machine's LAN address; `npm start` works that out for you. To point the app
+somewhere else, run it on its own:
+
+```bash
 EXPO_PUBLIC_API_URL=http://<your-lan-ip>:3000 npm run mobile
 ```
 
-Then scan the QR code with **Expo Go** (free, from either store), or open it in
-a development build. `localhost` is the phone itself, so a device on your
-network needs your machine's LAN address, and both have to be on the same
-Wi-Fi.
+Both devices have to be on the same Wi-Fi.
 
 ### What Expo Go can and cannot do
 

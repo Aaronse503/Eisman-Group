@@ -13,18 +13,21 @@ database and the same permissions.
 
 ```bash
 npm install
-npm run setup     # creates the database, migrates it, loads demo data
-npm run dev       # http://localhost:3000
+npm start
 ```
 
-For the phone, with the web application already running:
+That is the whole thing. `npm start` builds the database if it is not there,
+loads demo data, opens the web application on http://localhost:3000, works out
+this machine's address on the network, and starts the phone app already
+pointed at it — so there is no address to look up and no second window.
 
-```bash
-EXPO_PUBLIC_API_URL=http://<your-lan-ip>:3000 npm run mobile
-```
+Scan the QR code it prints with your phone's camera (iPhone) or Expo Go
+(Android). Your phone and your computer have to be on the same Wi-Fi.
+Ctrl+C stops everything.
 
-`MOBILE.md` covers the mobile application — what is on it, what stays on the
-desktop, and how to make a build.
+`npm run start:web` skips the phone app. `MOBILE.md` covers the mobile
+application — what is on it, what stays on the desktop, and how to make a
+build.
 
 There is nothing to provision. With no configuration the system runs on an
 embedded Postgres stored in `.data/pglite`, so `npm run setup` works on a
@@ -124,10 +127,12 @@ These are deliberate, and the tests enforce them:
 ## Commands
 
 ```bash
-npm run dev            # development server (web)
-npm run mobile         # the mobile app in Expo
+npm start              # everything: database, web app and phone app
+npm run start:web      # the same, without the phone app
+npm run dev            # the web app alone, assuming a database already exists
+npm run mobile         # the phone app alone
 npm run build          # production build
-npm run start          # serve the production build
+npm run start:production  # serve the production build
 npm run setup          # migrate and seed
 npm run db:migrate     # migrate only
 npm run db:seed        # seed only

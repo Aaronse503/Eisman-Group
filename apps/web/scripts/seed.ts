@@ -28,7 +28,11 @@ async function main() {
   console.log(`\nDone in ${((Date.now() - started) / 1000).toFixed(1)}s.`);
 
   // The next step is the whole point of having run this, so say it here
-  // rather than leaving it to be looked up.
+  // rather than leaving it to be looked up — unless `npm start` is doing the
+  // seeding, in which case it is about to take that step itself.
+  if (process.env.EISMAN_LAUNCHER === '1') {
+    process.exit(0);
+  }
   console.log(`
 ────────────────────────────────────────────────────────────
   Ready. Start it with:

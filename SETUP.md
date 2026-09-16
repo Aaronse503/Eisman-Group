@@ -4,17 +4,22 @@
 
 ```bash
 npm install
-npm run setup
-npm run dev
+npm start
 ```
 
 Open http://localhost:3000 and sign in as `aaron@eismandigital.com` with
 `ChangeMe123!`. You will be asked to choose a real password before anything
 else opens.
 
-`npm run setup` creates an embedded Postgres 17 under `.data/pglite`, runs
-every migration, and loads demo data. No database server, no credentials, no
-accounts anywhere. Requires Node 20 or newer.
+`npm start` does every step in order and says which one it is on: installs
+anything missing, creates an embedded Postgres 17 under `.data/pglite`, runs
+every migration, loads demo data, starts the web application, and starts the
+phone app pointed at this machine's address on the network. No database
+server, no credentials, no accounts anywhere. Requires Node 20 or newer.
+
+`npm run start:web` does the same without the phone app. The individual steps
+are still there — `npm run setup`, `npm run dev`, `npm run mobile` — for when
+you want to run one of them on its own.
 
 ### The one rule about the embedded database
 
@@ -36,15 +41,20 @@ npm run db:nuke && npm run setup
 
 ## On a phone
 
-With the web application running, in a second terminal:
+`npm start` already started it: scan the QR code it printed with your phone's
+camera (iPhone) or with Expo Go (Android). Both devices have to be on the same
+Wi-Fi.
+
+`localhost` on a phone means the phone, so the app has to be told this
+machine's address on the network. `npm start` works that out and passes it in.
+To do it by hand, or to point at something else:
 
 ```bash
 EXPO_PUBLIC_API_URL=http://<your-lan-ip>:3000 npm run mobile
 ```
 
-Scan the QR code with Expo Go. `localhost` on a phone means the phone, so a
-real device needs your machine's address on the network. `MOBILE.md` covers
-development builds, push notifications and what stays on the desktop.
+`MOBILE.md` covers what works in Expo Go, development builds, push
+notifications and what stays on the desktop.
 
 ## On a real Postgres
 

@@ -52,7 +52,7 @@ git clone … && cd Eisman-Group
 npm ci
 npm run build
 DATABASE_URL="…" npm run db:migrate
-npm run start            # behind nginx or Caddy with TLS
+npm run start:production # behind nginx or Caddy with TLS
 ```
 
 Run it under systemd or in Docker. Put a reverse proxy in front for TLS and
