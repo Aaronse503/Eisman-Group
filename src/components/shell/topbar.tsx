@@ -9,10 +9,13 @@ import {
   Clock,
   LogOut,
   Menu,
+  Monitor,
+  Moon,
   Plus,
   Search,
   Settings,
   ShieldCheck,
+  Sun,
   User,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -29,6 +32,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { NavIcon } from '@/components/icon';
 import { ThemeToggle } from '@/components/theme-provider';
+import { useTheme } from 'next-themes';
 import { Sidebar } from './sidebar';
 import { CompanySwitcher, type SwitcherCompany } from './company-switcher';
 import { openCommandPalette } from './command-palette';
@@ -71,6 +75,7 @@ export function Topbar({
   demoMode: boolean;
 }) {
   const router = useRouter();
+  const { setTheme } = useTheme();
   const [mobileNav, setMobileNav] = React.useState(false);
   const [items, setItems] = React.useState(notifications);
   React.useEffect(() => setItems(notifications), [notifications]);
@@ -204,7 +209,7 @@ export function Topbar({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <ThemeToggle />
+        <ThemeToggle className="hidden sm:inline-flex" />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -232,6 +237,17 @@ export function Topbar({
             <DropdownMenuItem onSelect={() => router.push('/settings/permissions')}>
               <ShieldCheck /> Roles &amp; permissions
             </DropdownMenuItem>
+            <DropdownMenuLabel className="sm:hidden">Appearance</DropdownMenuLabel>
+            <DropdownMenuItem className="sm:hidden" onSelect={() => setTheme('light')}>
+              <Sun /> Light
+            </DropdownMenuItem>
+            <DropdownMenuItem className="sm:hidden" onSelect={() => setTheme('dark')}>
+              <Moon /> Dark
+            </DropdownMenuItem>
+            <DropdownMenuItem className="sm:hidden" onSelect={() => setTheme('system')}>
+              <Monitor /> Match my device
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="sm:hidden" />
             <DropdownMenuItem onSelect={() => router.push('/settings/sessions')}>
               <Clock /> Active sessions
             </DropdownMenuItem>
