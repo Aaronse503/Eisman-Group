@@ -109,7 +109,7 @@ export function ImportWizard({
 
       {step === 'upload' ? (
         <div className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="import-entity">What are you importing?</Label>
               <NativeSelect id="import-entity" value={entityId} onChange={(e) => setEntityId(e.target.value)}>
@@ -202,7 +202,7 @@ export function ImportWizard({
 
           <div className="space-y-2">
             {entity.fields.map((field) => (
-              <div key={field.key} className="grid items-center gap-2 sm:grid-cols-[14rem_1fr]">
+              <div key={field.key} className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[14rem_1fr]">
                 <Label htmlFor={`map-${field.key}`} required={field.required}>
                   {field.label}
                   {field.hint ? (
@@ -246,7 +246,7 @@ export function ImportWizard({
 
       {step === 'preview' && entity ? (
         <div className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div className="rounded-lg border border-[var(--border)] p-3">
               <p className="text-[11px] tracking-wide text-[var(--fg-subtle)] uppercase">Rows in file</p>
               <p className="tnum text-xl font-semibold">{formatNumber(rows.length)}</p>

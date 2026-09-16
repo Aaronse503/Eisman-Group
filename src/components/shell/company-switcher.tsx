@@ -49,7 +49,9 @@ export function CompanySwitcher({
       <DropdownMenuTrigger asChild>
         <Button
           variant="secondary"
-          className="h-9 max-w-[13rem] justify-between gap-2 px-2.5"
+          // Shrinkable, so the actions on the right of the bar always fit:
+          // on a narrow screen the workspace name truncates instead.
+          className="h-9 min-w-0 max-w-[9rem] shrink justify-between gap-2 px-2.5 sm:max-w-[13rem]"
           aria-label="Switch workspace"
           loading={pending}
         >

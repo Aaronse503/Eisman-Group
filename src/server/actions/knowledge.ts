@@ -12,8 +12,10 @@ import { askKnowledge } from '@/lib/knowledge/assistant';
 import { buildKey, getStorage, isAllowedMime, MAX_UPLOAD_BYTES } from '@/lib/storage';
 import { allowedAccessLevels } from '@/lib/queries/knowledge';
 import type { ActionResult } from '@/lib/validation/schemas';
+import { rethrowControlFlow } from '@/lib/action-errors';
 
 function fail(err: unknown): ActionResult<never> {
+  rethrowControlFlow(err);
   if (err instanceof ForbiddenError) {
     return { ok: false, error: 'You do not have permission to do that here.' };
   }

@@ -8,6 +8,7 @@ import { hashPassword, generateToken } from '@/lib/crypto';
 import { revokeAllSessionsForUser } from '@/lib/auth/session';
 import { ROLES, type Role } from '@/lib/rbac/permissions';
 import type { ActionResult } from '@/lib/validation/schemas';
+import { rethrowControlFlow } from '@/lib/action-errors';
 
 /**
  * User and role administration.
@@ -18,6 +19,7 @@ import type { ActionResult } from '@/lib/validation/schemas';
  */
 
 function fail(err: unknown): ActionResult<never> {
+  rethrowControlFlow(err);
   if (err instanceof ForbiddenError) {
     return { ok: false, error: 'You do not have permission to manage members here.' };
   }

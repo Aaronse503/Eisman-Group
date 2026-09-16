@@ -54,7 +54,7 @@ export default async function ParfaxLocationsPage() {
           description="Locations are created alongside course, pro shop and retailer partnerships."
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {locations.map((l) => (
             <Card key={l.id}>
               <CardContent className="space-y-2 pt-5">

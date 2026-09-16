@@ -7,8 +7,10 @@ import { recordActivity } from '@/lib/activity';
 import { fieldErrors, type ActionResult } from '@/lib/validation/schemas';
 import { quickTaskSchema, taskSchema } from '@/lib/validation/tasks';
 import { TASK_STATUSES, nextOccurrence } from '@/lib/domain/tasks';
+import { rethrowControlFlow } from '@/lib/action-errors';
 
 function fail(err: unknown): ActionResult<never> {
+  rethrowControlFlow(err);
   if (err instanceof ForbiddenError) {
     return { ok: false, error: 'You do not have permission to change tasks in this company.' };
   }

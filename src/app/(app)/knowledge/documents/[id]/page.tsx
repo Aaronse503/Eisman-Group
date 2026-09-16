@@ -99,7 +99,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
         }
       />
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
           {doc.text_status !== 'extracted' ? (
             <Card className="border-[var(--warning)]/40">
@@ -164,7 +164,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
                   </div>
                 ) : null}
 
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                   {[
                     { label: 'People', values: doc.extracted_people, icon: Users },
                     { label: 'Organizations', values: doc.extracted_orgs, icon: FileText },

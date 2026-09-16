@@ -118,4 +118,9 @@ npm run verify         # typecheck, lint and test together
 ```
 
 The embedded database allows one process at a time, so stop the dev server
-before running a `db:*` script against it.
+before running a `db:*` script against it. For the same reason, give the
+end-to-end suite a scratch Postgres for a full run:
+
+```bash
+E2E_DATABASE_URL="postgresql://…/eisman_e2e" npm run test:e2e
+```

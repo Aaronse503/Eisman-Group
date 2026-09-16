@@ -38,13 +38,14 @@ test('rejects a client with no name instead of creating an empty record', async 
 test('filters the client list by status', async ({ page }) => {
   await page.goto('/crm');
   const before = await page.getByRole('row').count();
-  await page.getByLabel(/all statuses/i).selectOption('prospect');
-  await expect(page).toHaveURL(/status=prospect/);
+  await page.getByLabel('Filter by status').selectOption('prospect');
+  // The filter is applied in place rather than through the URL.
   await expect(page.getByRole('row')).not.toHaveCount(before);
+  await expect(page.getByText(/prospect/i).first()).toBeVisible();
 });
 
 test('switches between the table and the board', async ({ page }) => {
   await page.goto('/crm');
-  await page.getByRole('link', { name: /board/i }).click();
+  await page.getByRole('tab', { name: 'Board' }).click();
   await expect(page.getByText(/qualifying|negotiation|delivering/i).first()).toBeVisible();
 });

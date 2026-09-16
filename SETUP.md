@@ -98,8 +98,19 @@ npm run verify     # typecheck, lint, unit and integration tests
 npm run test:e2e   # end-to-end, against a throwaway database of its own
 ```
 
-The end-to-end suite builds the application and serves it on port 3100 with
-its own database in `.data/e2e-pglite`. It never touches your data.
+The end-to-end suite builds the application and serves it on port 3100 with a
+database of its own. It never touches your data.
+
+For a full run, give it a scratch Postgres:
+
+```bash
+E2E_DATABASE_URL="postgresql://…/eisman_e2e" npm run test:e2e
+```
+
+Without one it uses the embedded database, which is fine for a quick check but
+not for a long run: PGlite allows one process per data directory, a Next server
+can serve requests from more than one, and a heavy run can damage it. When that
+happens the tests fail in ways that look like application faults and are not.
 
 ## Troubleshooting
 

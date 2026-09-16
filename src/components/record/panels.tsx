@@ -378,7 +378,7 @@ export function CustomFieldsPanel({
           </Button>
         ) : null}
       </CardHeader>
-      <CardContent className="grid gap-3 sm:grid-cols-2">
+      <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {fields.map((field) => {
           const id = `cf-${field.def_id}`;
           const value = values[field.def_id];

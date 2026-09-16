@@ -172,7 +172,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         </TabsList>
 
         <TabsContent value="overview">
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <div className="space-y-4 lg:col-span-2">
               <Card>
                 <CardHeader>
@@ -381,7 +381,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         </TabsContent>
 
         <TabsContent value="work">
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <Card className="lg:col-span-2">
               <CardHeader className="flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
@@ -441,7 +441,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         </TabsContent>
 
         <TabsContent value="meetings">
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <Card>
               <CardHeader className="flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
@@ -485,7 +485,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
 
         {canSeeFinance ? (
           <TabsContent value="finance">
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <Card>
                 <CardHeader className="flex-row items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
@@ -557,7 +557,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         </TabsContent>
 
         <TabsContent value="timeline">
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>Record activity</CardTitle>

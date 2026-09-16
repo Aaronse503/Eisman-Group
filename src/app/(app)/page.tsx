@@ -294,7 +294,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
       {scope.isHoldings && breakdown.length > 1 ? (
         <section className="mb-6">
           <SectionHeading title="By company" />
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {breakdown.map((company) => (
               <Card key={company.id}>
                 <CardHeader className="flex-row items-center gap-2.5 pb-2">
@@ -332,9 +332,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         </section>
       ) : null}
 
-      <div className="grid items-start gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
         {canSeeFinance && trend.length ? (
-          <Card className="lg:col-span-2">
+          <Card className="min-w-0 lg:col-span-2">
             <CardHeader>
               <CardTitle>Revenue and expenses</CardTitle>
               <SourceNote source="Recorded payments and expenses, last 12 months" />

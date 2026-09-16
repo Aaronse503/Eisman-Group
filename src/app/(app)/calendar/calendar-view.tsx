@@ -115,7 +115,7 @@ export function CalendarView({
           </p>
         </div>
 
-        <div className="grid gap-2 md:grid-cols-7">
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-7">
           {days.map((day) => {
             const key = dayKey(day);
             const items = (byDay.get(key) ?? []).sort(

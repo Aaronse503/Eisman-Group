@@ -52,9 +52,15 @@ export function KnowledgeTabs({
         accessorKey: 'name',
         cell: ({ row }) => (
           <div className="min-w-0">
-            <Link href={`/knowledge/documents/${row.original.id}`} className="font-medium hover:text-[var(--accent)] hover:underline">
-              {row.original.name}
-            </Link>
+            <span className="flex items-center gap-2">
+              <Link
+                href={`/knowledge/documents/${row.original.id}`}
+                className="truncate font-medium hover:text-[var(--accent)] hover:underline"
+              >
+                {row.original.name}
+              </Link>
+              {row.original.is_demo ? <Badge tone="gold">Demo data</Badge> : null}
+            </span>
             {row.original.summary ? (
               <p className="mt-0.5 line-clamp-1 text-xs text-[var(--fg-subtle)]">
                 {truncate(row.original.summary, 120)}
@@ -155,7 +161,7 @@ export function KnowledgeTabs({
             description="Notes written on clients, partnerships and investors appear here and feed the assistant."
           />
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {notes.map((note) => (
               <Card key={note.id}>
                 <CardHeader className="pb-2">
@@ -188,7 +194,7 @@ export function KnowledgeTabs({
         {folders.length === 0 ? (
           <EmptyState icon={FolderOpen} title="No folders" description="Folders are created with each company." />
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {folders.map((folder) => (
               <Card key={folder.id}>
                 <CardContent className="flex items-start gap-3 pt-5">

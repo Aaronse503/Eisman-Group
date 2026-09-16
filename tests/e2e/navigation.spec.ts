@@ -25,15 +25,15 @@ test('the command palette opens and navigates', async ({ page }) => {
   await page.keyboard.press('ControlOrMeta+k');
   const palette = page.getByRole('dialog');
   await expect(palette).toBeVisible();
-  await page.getByPlaceholder(/search|type a command/i).fill('Investors');
+  await page.getByPlaceholder(/search clients, tasks, investors/i).fill('Investors');
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/investors/);
 });
 
 test('global search finds a seeded client', async ({ page }) => {
   await page.goto('/');
-  await page.getByPlaceholder(/search everything/i).click();
-  await page.getByPlaceholder(/search|type a command/i).fill('Kestrel');
+  await page.keyboard.press('ControlOrMeta+k');
+  await page.getByPlaceholder(/search clients, tasks, investors/i).fill('Kestrel');
   await expect(page.getByText(/kestrel/i).first()).toBeVisible();
 });
 

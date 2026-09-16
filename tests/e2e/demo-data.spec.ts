@@ -23,5 +23,5 @@ test('the demo reset needs a typed confirmation and a reason', async ({ page }) 
 test('demo records are badged wherever they appear', async ({ page }) => {
   await signInFast(page);
   await page.goto('/knowledge');
-  await expect(page.getByText('Demo').first()).toBeVisible();
+  await expect(page.getByText('Demo data').first()).toBeVisible();
 });

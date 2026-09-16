@@ -32,7 +32,7 @@ export default async function LoginPage() {
   return (
     <main
       id="main"
-      className="grid min-h-dvh lg:grid-cols-[1.05fr_1fr]"
+      className="grid grid-cols-1 min-h-dvh lg:grid-cols-[1.05fr_1fr]"
       style={{ background: 'var(--bg)' }}
     >
       <section

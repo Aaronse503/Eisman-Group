@@ -61,7 +61,7 @@ export default async function DemoDataPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {HEADLINES.map((item) => (
               <div key={item.label} className="rounded-xl bg-[var(--surface-sunken)] px-4 py-3">
                 <p className="text-xl font-semibold tabular-nums">{sum(item.keys).toLocaleString()}</p>

@@ -27,7 +27,10 @@ function monthLabel(month: string) {
 
 export function RevenueChart({ data }: { data: TrendPoint[] }) {
   return (
-    <div className="h-64 w-full">
+    // min-w-0 matters: the chart measures its parent, and a grid or flex item
+    // defaults to min-width:auto, which lets the chart push the page wider
+    // than the screen instead of shrinking to fit.
+    <div className="h-64 w-full min-w-0 overflow-hidden">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
           <defs>

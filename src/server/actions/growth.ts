@@ -9,8 +9,10 @@ import { indexSource, removeFromIndex } from '@/lib/knowledge/index-content';
 import { fieldErrors, type ActionResult } from '@/lib/validation/schemas';
 import { investorSchema, partnershipSchema } from '@/lib/validation/growth';
 import { INVESTOR_STAGES, PARTNERSHIP_STAGES, STAGE_PROBABILITY, type InvestorStage } from '@/lib/domain/growth';
+import { rethrowControlFlow } from '@/lib/action-errors';
 
 function fail(err: unknown): ActionResult<never> {
+  rethrowControlFlow(err);
   if (err instanceof ForbiddenError) {
     return { ok: false, error: 'You do not have permission to do that here.' };
   }

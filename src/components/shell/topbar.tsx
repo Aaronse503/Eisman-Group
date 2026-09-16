@@ -111,7 +111,7 @@ export function Topbar({
         </kbd>
       </button>
 
-      <div className="ml-auto flex items-center gap-1">
+      <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
         <Button variant="ghost" size="icon" className="md:hidden" onClick={openCommandPalette} aria-label="Search">
           <Search />
         </Button>

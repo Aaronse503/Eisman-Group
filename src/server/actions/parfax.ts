@@ -8,6 +8,7 @@ import { recordAudit } from '@/lib/audit';
 import { objectsToCsv } from '@/lib/csv/client';
 import type { ActionResult } from '@/lib/validation/schemas';
 import { parfaxMetricSchema } from '@/lib/validation/parfax';
+import { rethrowControlFlow } from '@/lib/action-errors';
 
 /**
  * ParFax administration.
@@ -21,6 +22,7 @@ import { parfaxMetricSchema } from '@/lib/validation/parfax';
  */
 
 function fail(err: unknown): ActionResult<never> {
+  rethrowControlFlow(err);
   if (err instanceof ForbiddenError) {
     return { ok: false, error: 'You do not have permission to administer ParFax users.' };
   }

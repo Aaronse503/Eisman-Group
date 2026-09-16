@@ -7,8 +7,10 @@ import { recordActivity } from '@/lib/activity';
 import { indexSource, removeFromIndex } from '@/lib/knowledge/index-content';
 import { fieldErrors, type ActionResult } from '@/lib/validation/schemas';
 import { actionItemSchema, meetingSchema } from '@/lib/validation/meetings';
+import { rethrowControlFlow } from '@/lib/action-errors';
 
 function fail(err: unknown): ActionResult<never> {
+  rethrowControlFlow(err);
   if (err instanceof ForbiddenError) {
     return { ok: false, error: 'You do not have permission to change meetings in this company.' };
   }

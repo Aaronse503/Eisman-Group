@@ -7,8 +7,10 @@ import { recordActivity } from '@/lib/activity';
 import { recordAudit } from '@/lib/audit';
 import { fieldErrors, type ActionResult } from '@/lib/validation/schemas';
 import { memberSchema, reassignSchema } from '@/lib/validation/team';
+import { rethrowControlFlow } from '@/lib/action-errors';
 
 function fail(err: unknown): ActionResult<never> {
+  rethrowControlFlow(err);
   if (err instanceof ForbiddenError) {
     return { ok: false, error: 'You do not have permission to change people records here.' };
   }

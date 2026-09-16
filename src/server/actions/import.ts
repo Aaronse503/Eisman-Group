@@ -8,8 +8,10 @@ import { recordAudit } from '@/lib/audit';
 import { getImportEntity, validateRows } from '@/lib/csv/import';
 import { indexSource, removeFromIndex } from '@/lib/knowledge/index-content';
 import type { ActionResult } from '@/lib/validation/schemas';
+import { rethrowControlFlow } from '@/lib/action-errors';
 
 function fail(err: unknown): ActionResult<never> {
+  rethrowControlFlow(err);
   if (err instanceof ForbiddenError) {
     return { ok: false, error: 'You do not have permission to import that here.' };
   }

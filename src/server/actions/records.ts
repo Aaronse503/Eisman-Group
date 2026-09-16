@@ -8,6 +8,7 @@ import { recordAudit } from '@/lib/audit';
 import { indexSource, removeFromIndex } from '@/lib/knowledge/index-content';
 import type { ActionResult } from '@/lib/validation/schemas';
 import type { Permission } from '@/lib/rbac/permissions';
+import { rethrowControlFlow } from '@/lib/action-errors';
 
 /**
  * Generic sidecar actions, addressed by (entityType, entityId).
@@ -70,6 +71,7 @@ async function authorize(entityType: string, entityId: string) {
 
 function guard<T>(fn: () => Promise<ActionResult<T>>): Promise<ActionResult<T>> {
   return fn().catch((err) => {
+    rethrowControlFlow(err);
     if (err instanceof ForbiddenError) {
       return { ok: false as const, error: 'You do not have permission to change this record.' };
     }

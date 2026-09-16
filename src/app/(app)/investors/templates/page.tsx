@@ -58,7 +58,7 @@ export default async function TemplatesPage({
               <h2 className="mb-3 text-sm font-semibold tracking-wide text-[var(--fg-muted)] uppercase">
                 {titleCase(category)}
               </h2>
-              <div className="grid gap-4 lg:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {items.map((t) => (
                   <Card key={t.id}>
                     <CardHeader className="flex-row items-start justify-between gap-2">

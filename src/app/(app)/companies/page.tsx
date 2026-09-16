@@ -75,7 +75,7 @@ export default async function CompaniesPage() {
           }
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {active.map((company) => {
             const finance = financeById.get(company.id);
             const count = countsById.get(company.id);
@@ -158,7 +158,7 @@ export default async function CompaniesPage() {
           <h2 className="mb-3 text-sm font-semibold tracking-wide text-[var(--fg-muted)] uppercase">
             Archived
           </h2>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
             {archived.map((company) => (
               <Card key={company.id} className="opacity-70">
                 <CardContent className="flex items-center justify-between gap-2 pt-5">

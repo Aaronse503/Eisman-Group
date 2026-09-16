@@ -7,8 +7,10 @@ import { recordActivity } from '@/lib/activity';
 import { recordAudit } from '@/lib/audit';
 import { fieldErrors, type ActionResult } from '@/lib/validation/schemas';
 import { adjustmentSchema, expenseSchema, invoiceSchema, paymentSchema } from '@/lib/validation/finance';
+import { rethrowControlFlow } from '@/lib/action-errors';
 
 function fail(err: unknown): ActionResult<never> {
+  rethrowControlFlow(err);
   if (err instanceof ForbiddenError) {
     return { ok: false, error: 'You do not have permission to change financial records here.' };
   }

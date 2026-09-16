@@ -15,16 +15,17 @@ test('shows the finance overview with its source stated', async ({ page }) => {
 
 test('creates an invoice', async ({ page }) => {
   await page.goto('/finances/invoices/new');
-  await expect(page.getByRole('heading', { name: /invoice/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'New invoice' })).toBeVisible();
   await page.getByRole('button', { name: /create invoice/i }).click();
-  // Either it saves or it tells you what is missing; it never silently does nothing.
-  await expect(page.getByText(/required|enter|choose|created|saved/i).first()).toBeVisible();
+  // Either it saves or it says what is missing; it never silently does nothing.
+  await expect(page.getByText(/required|enter|choose|check the highlighted|created|saved/i).first())
+    .toBeVisible();
 });
 
 test('moves between the finance tabs without leaving the page', async ({ page }) => {
   await page.goto('/finances');
-  for (const tab of ['Invoices', 'Payments', 'Expenses', 'Subscriptions']) {
-    await page.getByRole('link', { name: new RegExp(tab, 'i') }).first().click();
+  for (const tab of ['Payments', 'Expenses', 'Subscriptions', 'Profitability']) {
+    await page.getByRole('tab', { name: new RegExp(`^${tab}`) }).click();
     await expect(page.getByRole('heading', { name: 'Finances' })).toBeVisible();
   }
 });

@@ -32,6 +32,10 @@ async function createPostgres(connectionString: string): Promise<Db> {
   const pool = new Pool({
     connectionString,
     max: Number(process.env.DATABASE_POOL_MAX ?? 10),
+    // Set on the connection itself rather than by issuing a statement after
+    // it opens: a query fired from the pool's 'connect' event races the first
+    // real query on that client, and can lose.
+    options: '-c app.service_role=on',
     ssl: /\bsslmode=disable\b/.test(connectionString)
       ? false
       : connectionString.includes('localhost') || connectionString.includes('127.0.0.1')
@@ -42,9 +46,6 @@ async function createPostgres(connectionString: string): Promise<Db> {
   // The application connection is the trusted service role: authorization is
   // enforced in src/lib/rbac. `asUser()` turns it off transaction-locally so
   // RLS policies apply, which is how the RLS tests run.
-  pool.on('connect', (client) => {
-    void client.query(`set app.service_role = 'on'`);
-  });
 
   const wrap = (runner: {
     query: (text: string, params?: readonly unknown[]) => Promise<{ rows: unknown[] }>;
@@ -127,14 +128,28 @@ function acquirePgliteLock(dataDir: string) {
   if (existsSync(lockPath)) {
     const holder = Number.parseInt(readFileSync(lockPath, 'utf8').trim(), 10);
     if (Number.isFinite(holder) && holder !== process.pid) {
-      let alive = false;
-      try {
-        process.kill(holder, 0);
-        alive = true;
-      } catch {
-        alive = false;
+      // A holder that has just been signalled is still writing for a moment.
+      // Opening the directory in that window is what actually corrupts it, so
+      // wait for the process to go before deciding anything.
+      const deadline = Date.now() + 10_000;
+      let alive = true;
+      while (alive && Date.now() < deadline) {
+        try {
+          process.kill(holder, 0);
+          // Busy-wait deliberately: this runs before any database work, in a
+          // process that has nothing else to do yet, and must not yield to
+          // code that would try to open the database again.
+          const until = Date.now() + 100;
+          while (Date.now() < until) { /* spin */ }
+        } catch {
+          alive = false;
+        }
       }
       if (alive) throw new PgliteLockedError(holder, dataDir);
+      // Give the operating system a moment to flush the departed process's
+      // writes before reading the directory.
+      const settle = Date.now() + 250;
+      while (Date.now() < settle) { /* spin */ }
     }
     // Stale: the previous owner died without cleaning up.
     rmSync(join(resolved, 'postmaster.pid'), { force: true });

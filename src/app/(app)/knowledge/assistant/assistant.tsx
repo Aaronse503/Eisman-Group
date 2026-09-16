@@ -59,7 +59,7 @@ export function KnowledgeAssistant({
   };
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_18rem]">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_18rem]">
       <div className="min-w-0 space-y-4">
         <Card>
           <CardContent className="pt-5">

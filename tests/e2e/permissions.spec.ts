@@ -12,7 +12,7 @@ test('a viewer sees no finance navigation and cannot open the finance pages', as
   await expect(page.getByRole('link', { name: 'Finances' })).toHaveCount(0);
 
   await page.goto('/finances');
-  await expect(page.getByText(/permission|not allowed|do not have/i).first()).toBeVisible();
+  await expect(page.getByText(/don.t have access to this/i)).toBeVisible();
 });
 
 test('a viewer cannot create a client', async ({ page }) => {
@@ -31,7 +31,7 @@ test('the ParFax lead sees ParFax but not the Eisman Digital client list', async
 test('only the Holdings Owner can reach the demo data controls', async ({ page }) => {
   await signInFast(page, 'dana.ops@demo.eisman.test', DEMO_PASSWORD);
   await page.goto('/settings/demo-data');
-  await expect(page.getByText(/permission|not allowed|do not have/i).first()).toBeVisible();
+  await expect(page.getByText(/don.t have access to this/i)).toBeVisible();
 
   await signInFast(page);
   await page.goto('/settings/demo-data');
@@ -41,7 +41,7 @@ test('only the Holdings Owner can reach the demo data controls', async ({ page }
 test('the owner sees every company in the switcher', async ({ page }) => {
   await signInFast(page);
   await page.goto('/');
-  await page.getByRole('button', { name: /eisman holdings/i }).first().click();
-  await expect(page.getByText('Eisman Digital')).toBeVisible();
-  await expect(page.getByText('ParFax')).toBeVisible();
+  await page.getByRole('button', { name: 'Switch workspace' }).click();
+  await expect(page.getByRole('menuitem', { name: /eisman digital/i })).toBeVisible();
+  await expect(page.getByRole('menuitem', { name: /parfax/i })).toBeVisible();
 });

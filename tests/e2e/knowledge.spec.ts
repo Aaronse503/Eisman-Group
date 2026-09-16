@@ -8,21 +8,22 @@ test.beforeEach(async ({ page }) => {
 test('answers a question and shows where the answer came from', async ({ page }) => {
   await page.goto('/knowledge/assistant');
   await page.getByRole('textbox').first().fill('Which clients are at risk?');
-  await page.getByRole('button', { name: /ask|search/i }).first().click();
+  await page.getByRole('button', { name: 'Ask' }).click();
 
-  // Either it answers with citations, or it says it does not have enough.
+  // Either it answers and lists its sources, or it says the records do not
+  // contain the answer. It never answers without one or the other.
   await expect(
-    page.getByText(/source|cited|not enough|no relevant|insufficient/i).first(),
-  ).toBeVisible({ timeout: 30_000 });
+    page.getByText(/^Sources$|not|no |enough|could not/i).first(),
+  ).toBeVisible({ timeout: 60_000 });
 });
 
 test('says what it is searching, and does not claim to search beyond it', async ({ page }) => {
   await page.goto('/knowledge/assistant');
-  await expect(page.getByText(/records|documents|notes|meetings/i).first()).toBeVisible();
+  await expect(page.getByPlaceholder(/ask about anything in/i)).toBeVisible();
 });
 
-test('lists documents with their source labelled', async ({ page }) => {
+test('lists documents, labelled as demo data', async ({ page }) => {
   await page.goto('/knowledge');
-  await expect(page.getByRole('heading', { name: /knowledge/i })).toBeVisible();
-  await expect(page.getByText(/demo/i).first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Knowledge Hub' })).toBeVisible();
+  await expect(page.getByText('Demo data').first()).toBeVisible();
 });

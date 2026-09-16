@@ -10,8 +10,10 @@ import { getAdapter } from '@/lib/integrations/adapters';
 import { getProvider, type ProviderId } from '@/lib/integrations/registry';
 import { sql } from '@/lib/db/client';
 import type { ActionResult } from '@/lib/validation/schemas';
+import { rethrowControlFlow } from '@/lib/action-errors';
 
 function fail(err: unknown): ActionResult<never> {
+  rethrowControlFlow(err);
   if (err instanceof ForbiddenError) {
     return { ok: false, error: 'You do not have permission to manage integrations here.' };
   }

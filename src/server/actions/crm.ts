@@ -11,8 +11,10 @@ import {
   clientSchema, contactSchema, dealSchema, organizationSchema, type ClientInput,
 } from '@/lib/validation/crm';
 import { CLIENT_STAGES, DEAL_STAGES } from '@/lib/domain/crm';
+import { rethrowControlFlow } from '@/lib/action-errors';
 
 function fail(err: unknown): ActionResult<never> {
+  rethrowControlFlow(err);
   if (err instanceof ForbiddenError) {
     return { ok: false, error: 'You do not have permission to do that in this company.' };
   }

@@ -7,6 +7,7 @@ import { getEnv } from '@/lib/env';
 import { resetDemoData, seedAll, demoCounts } from '@/lib/seed';
 import { DEMO_RESET_PHRASE } from '@/lib/validation/demo';
 import type { ActionResult } from '@/lib/validation/schemas';
+import { rethrowControlFlow } from '@/lib/action-errors';
 
 /**
  * Demo data administration.
@@ -28,6 +29,7 @@ const schema = z.object({
 });
 
 function fail(err: unknown): ActionResult<never> {
+  rethrowControlFlow(err);
   if (err instanceof ForbiddenError) {
     return { ok: false, error: 'Only a Holdings Owner can manage demo data.' };
   }

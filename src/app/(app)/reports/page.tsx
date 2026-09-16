@@ -59,7 +59,7 @@ export default async function ReportsPage({
               <h2 className="mb-3 text-sm font-semibold tracking-wide text-[var(--fg-muted)] uppercase">
                 {group}
               </h2>
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {reports.map((report) => (
                   <Link key={report.id} href={q(report.id)} className="group">
                     <Card className="h-full transition-colors group-hover:border-[var(--accent)]/45">
