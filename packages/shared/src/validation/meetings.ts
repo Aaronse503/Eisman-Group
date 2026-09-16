@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { optionalDate, optionalString, optionalUrl, optionalUuid } from './schemas';
-import { MEETING_STATUSES } from '@/lib/domain/meetings';
+import { MEETING_STATUSES } from '../domain/meetings';
 
 export const meetingSchema = z
   .object({

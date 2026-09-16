@@ -1,10 +1,7 @@
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
+/**
+ * Formatting shared by both applications, so a number reads the same on a
+ * laptop and on a phone.
+ */
 export function formatCurrency(
   value: number | string | null | undefined,
   currency = 'USD',

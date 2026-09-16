@@ -3,7 +3,7 @@ import { money, optionalDate, optionalDateTime, optionalString, optionalUrl, opt
 import {
   CONTRACT_STATUSES, INTEREST_LEVELS, INVESTOR_STAGES, INVESTOR_TYPES,
   OUTREACH_STATUSES, PARTNERSHIP_CATEGORIES, PARTNERSHIP_STAGES,
-} from '@/lib/domain/growth';
+} from '../domain/growth';
 
 const csv = z
   .union([z.string(), z.array(z.string())])

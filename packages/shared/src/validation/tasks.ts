@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { optionalDateTime, optionalString, optionalUuid } from './schemas';
-import { TASK_PRIORITIES, TASK_STATUSES } from '@/lib/domain/tasks';
+import { TASK_PRIORITIES, TASK_STATUSES } from '../domain/tasks';
 
 export const taskSchema = z.object({
   companyId: z.string().uuid('Choose a company'),

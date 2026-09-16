@@ -1,9 +1,29 @@
 import { readdir, readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { existsSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { getDb } from './client';
 
-const MIGRATIONS_DIR = join(process.cwd(), 'db', 'migrations');
+/**
+ * The migrations live at the top of the repository and are shared by both
+ * applications, so find them by walking up from wherever this process started
+ * rather than assuming the working directory.
+ */
+function findMigrationsDir(): string {
+  let dir = resolve(process.cwd());
+  for (let i = 0; i < 6; i++) {
+    const candidate = join(dir, 'db', 'migrations');
+    if (existsSync(candidate)) return candidate;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  throw new Error(
+    `Could not find db/migrations above ${process.cwd()}. Run this from inside the repository.`,
+  );
+}
+
+const MIGRATIONS_DIR = findMigrationsDir();
 
 export interface AppliedMigration {
   name: string;

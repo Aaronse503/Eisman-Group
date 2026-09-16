@@ -4,7 +4,7 @@ import {
 } from './schemas';
 import {
   CLIENT_STAGES, CLIENT_STATUSES, CONTACT_ROLES, DEAL_STAGES, ORGANIZATION_ROLES,
-} from '@/lib/domain/crm';
+} from '../domain/crm';
 
 /**
  * CRM input schemas. These live outside the server-action module because a
