@@ -55,8 +55,9 @@ partners, vendors, referral sources. A contact can be linked to several.
 
 **Deals** track pipeline: value, probability, expected close.
 
-Every list can be filtered, sorted, searched and exported to CSV. A filter you
-use often can be saved as a view and shared with your company.
+Every list can be filtered, sorted, searched and exported to CSV. Filters live
+in the address bar, so a filtered list can be bookmarked or sent to a
+colleague — saving one as a named view is not built yet.
 
 ## Tasks
 

@@ -11,7 +11,7 @@ file.
 
 | File | Contents |
 | --- | --- |
-| `0001_core.sql` | Holding, companies, users, sessions, roles, audit log, rate limits, tags, custom fields, saved views |
+| `0001_core.sql` | Holding, companies, users, sessions, roles, audit log, rate limits, tags, custom fields, saved views (table only; no interface yet) |
 | `0002_crm.sql` | Clients, contacts, organizations, deals, activity |
 | `0003_ops.sql` | Projects, tasks, dependencies, calendars, meetings, notes, documents, folders, imports |
 | `0004_growth.sql` | Partnerships, investors, outreach, message templates |
