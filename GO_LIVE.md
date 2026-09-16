@@ -36,8 +36,16 @@ Two accounts are needed and neither takes a card:
 npm run gen:secrets
 ```
 
-Writes `apps/web/.env.production.local`, which is git-ignored. Open it, paste
-in the four Supabase values from step 1, and leave `APP_URL` blank for now.
+Writes **`apps/web/.env.production.local`**, which is git-ignored. The leading
+dot hides it in Finder and Explorer, so the command prints the exact line that
+opens it — on a Mac that is:
+
+```bash
+open -e apps/web/.env.production.local
+```
+
+Paste in the four Supabase values from step 1, and leave `APP_URL` blank for
+now.
 
 **Keep a copy in your password manager.** If `ENCRYPTION_KEY` is lost, stored
 integration credentials cannot be decrypted. If `AUTH_SECRET` is lost,

@@ -90,9 +90,21 @@ async function main() {
   console.log('─'.repeat(70));
   console.log(body.trimEnd());
   console.log('─'.repeat(70));
+  // The leading dot hides the file in Finder and Explorer, so say how to open
+  // it rather than leaving someone hunting for it.
+  const openCommand =
+    process.platform === 'darwin'
+      ? `open -e ${TARGET}`
+      : process.platform === 'win32'
+        ? `notepad ${TARGET}`
+        : `xdg-open ${TARGET}`;
+
   console.log(`
 Next:
-  1. Fill in the blank values from Supabase and your Netlify URL.
+  1. Open it and fill in the blanks from Supabase and your Netlify URL:
+
+         ${openCommand}
+
   2. Check it:            npm run check:deploy
   3. Paste it into Netlify's environment variables.
 
