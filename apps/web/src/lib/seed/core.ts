@@ -3,6 +3,9 @@ import { hashPassword } from '@/lib/crypto';
 import type { Role } from '@/lib/rbac/permissions';
 
 export const DEMO_PASSWORD = 'demo1234!';
+/** The operator account the seed creates, and its one-time password. */
+export const OWNER_EMAIL = 'aaron@eismandigital.com';
+export const OWNER_PASSWORD = 'ChangeMe123!';
 export const DEMO_EMAIL_DOMAIN = 'demo.eisman.test';
 
 export interface SeedContext {
@@ -112,12 +115,12 @@ export async function seedCore(opts: { ownerEmail?: string; ownerPassword?: stri
   const users: Record<string, string> = {};
 
   // The real operator account. Its password must be changed at first sign-in.
-  const ownerEmail = opts.ownerEmail ?? 'aaron@eismandigital.com';
+  const ownerEmail = opts.ownerEmail ?? OWNER_EMAIL;
   users.owner = await upsertUser({
     email: ownerEmail,
     name: 'Aaron Eisman',
     title: 'Founder, Eisman Holdings',
-    password: opts.ownerPassword ?? 'ChangeMe123!',
+    password: opts.ownerPassword ?? OWNER_PASSWORD,
     isDemo: false,
     mustChange: !opts.ownerPassword,
   });

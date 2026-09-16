@@ -4,7 +4,7 @@ config({ quiet: true });
 
 import { seedAll, demoCounts } from '../src/lib/seed';
 import { getEnv } from '../src/lib/env';
-import { DEMO_PASSWORD } from '../src/lib/seed/core';
+import { DEMO_PASSWORD, OWNER_EMAIL, OWNER_PASSWORD } from '../src/lib/seed/core';
 
 async function main() {
   const env = getEnv();
@@ -26,6 +26,28 @@ async function main() {
     console.log(`\nDemo sign-in password for every demo account: ${DEMO_PASSWORD}`);
   }
   console.log(`\nDone in ${((Date.now() - started) / 1000).toFixed(1)}s.`);
+
+  // The next step is the whole point of having run this, so say it here
+  // rather than leaving it to be looked up.
+  console.log(`
+────────────────────────────────────────────────────────────
+  Ready. Start it with:
+
+      npm run dev
+
+  Then open  http://localhost:3000  and sign in:
+
+      ${OWNER_EMAIL}
+      ${OWNER_PASSWORD}      (you will be asked to change it)
+${
+  seededDemo
+    ? `
+  To see what a different role can reach, sign in as
+  val.viewer@demo.eisman.test with the password ${DEMO_PASSWORD}.
+`
+    : ''
+}────────────────────────────────────────────────────────────
+`);
   process.exit(0);
 }
 
