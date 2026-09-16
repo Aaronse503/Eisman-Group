@@ -30,14 +30,48 @@ export default async function IntegrationsPage({
   const env = getEnv();
   const canWrite = actor.can('integration:write', scope.companyId);
 
-  // One card per provider; company-scoped providers show a card per company
-  // the actor can see, so nothing is silently merged across tenants.
-  type Card = { provider: (typeof PROVIDERS)[number]; connection: (typeof connections)[number] | null };
+  // One card per provider; company-scoped providers show a card per company the
+  // actor can see, so nothing is silently merged across tenants — and so a card
+  // that has not been connected yet still knows which company it is for. A
+  // company-scoped connection made with no company can authenticate but can
+  // never sync, which is a confusing place to leave someone.
+  const companies = actor.companies.filter(
+    (c) => !c.archived_at && scope.companyIds.includes(c.id),
+  );
+
+  type Card = {
+    provider: (typeof PROVIDERS)[number];
+    connection: (typeof connections)[number] | null;
+    /** The company this card connects for; null for holdings-wide providers. */
+    companyId: string | null;
+    companyName: string | null;
+  };
+
   const cards: Card[] = PROVIDERS.flatMap((provider): Card[] => {
     const matching = connections.filter((c) => c.provider === provider.id);
-    return matching.length
-      ? matching.map((connection) => ({ provider, connection }))
-      : [{ provider, connection: null }];
+
+    if (provider.scope === 'holding') {
+      return matching.length
+        ? matching.map((connection) => ({ provider, connection, companyId: null, companyName: null }))
+        : [{ provider, connection: null, companyId: null, companyName: null }];
+    }
+
+    // A card for every company, carrying any connection that company already has.
+    const perCompany: Card[] = companies.map((company) => ({
+      provider,
+      connection: matching.find((c) => c.company_id === company.id) ?? null,
+      companyId: company.id,
+      companyName: company.name,
+    }));
+
+    // Connections made before this page knew to ask — holdings-level rows for a
+    // company-scoped provider. They are shown so they can be disconnected
+    // rather than sitting invisibly in the database failing every sync.
+    const orphans: Card[] = matching
+      .filter((c) => !c.company_id)
+      .map((connection) => ({ provider, connection, companyId: null, companyName: null }));
+
+    return [...perCompany, ...orphans];
   });
 
   return (
@@ -68,9 +102,11 @@ export default async function IntegrationsPage({
       </Card>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {cards.map(({ provider, connection }) => (
+        {cards.map(({ provider, connection, companyId, companyName }) => (
           <IntegrationCard
-            key={`${provider.id}-${connection?.id ?? 'none'}`}
+            key={`${provider.id}-${connection?.id ?? companyId ?? 'none'}`}
+            companyId={companyId}
+            companyLabel={companyName}
             provider={{
               id: provider.id,
               name: provider.name,

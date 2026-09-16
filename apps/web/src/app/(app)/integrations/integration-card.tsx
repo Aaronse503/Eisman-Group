@@ -65,11 +65,16 @@ export function IntegrationCard({
   connection,
   canWrite,
   demoAvailable,
+  companyId,
+  companyLabel,
 }: {
   provider: ProviderView;
   connection: ConnectionView | null;
   canWrite: boolean;
   demoAvailable: boolean;
+  /** The company this card connects for. Null for a holdings-wide provider. */
+  companyId: string | null;
+  companyLabel: string | null;
 }) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
@@ -99,11 +104,13 @@ export function IntegrationCard({
           <div className="min-w-0">
             <CardTitle className="flex items-center gap-2">
               {provider.name}
-              {connection?.companyName ? (
-                <Badge tone="outline">{connection.companyName}</Badge>
+              {connection?.companyName ?? companyLabel ? (
+                <Badge tone="outline">{connection?.companyName ?? companyLabel}</Badge>
               ) : provider.scope === 'holding' ? (
                 <Badge tone="outline">Holdings</Badge>
-              ) : null}
+              ) : (
+                <Badge tone="warning">No company</Badge>
+              )}
             </CardTitle>
             <p className="mt-0.5 text-sm text-[var(--fg-muted)]">{provider.tagline}</p>
           </div>
@@ -262,7 +269,12 @@ export function IntegrationCard({
               loading={pending === 'creds'}
               onClick={async () => {
                 if (!connection) {
-                  await run('creds', () => ensureConnectionAction(provider.id, null));
+                  await run('creds', () =>
+                    ensureConnectionAction(
+                      provider.id,
+                      provider.scope === 'holding' ? null : companyId,
+                    ),
+                  );
                 }
                 setCreds({});
                 setCredsOpen(true);

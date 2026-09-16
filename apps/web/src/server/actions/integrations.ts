@@ -138,6 +138,18 @@ export async function ensureConnectionAction(
   try {
     const def = getProvider(provider);
     if (!def) return { ok: false, error: 'Unknown provider.' };
+
+    // A company-scoped provider with no company can authenticate but can never
+    // sync: every adapter needs a company to attribute its records to. Refusing
+    // here keeps that state out of the database entirely, rather than letting
+    // it be discovered later as a failed run.
+    if (def.scope === 'company' && !companyId) {
+      return {
+        ok: false,
+        error: `${def.name} connects to one company. Choose Eisman Digital or ParFax in the workspace switcher, then connect it there.`,
+      };
+    }
+
     const actor = companyId ? await requireCompanyAccess(companyId) : await requireActor();
     if (!actor.can('integration:write', companyId)) {
       return { ok: false, error: 'You do not have permission to add an integration here.' };
