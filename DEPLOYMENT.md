@@ -53,7 +53,20 @@ both have free tiers that this fits inside.
    The application also applies outstanding migrations itself on first use, so
    this is belt and braces — but doing it from a checkout means you watch them
    apply rather than finding out from a log.
-5. **Deploy**, then sign in and change the owner password immediately.
+5. **Check it before you deploy it.** With the same values in your shell, from
+   a checkout:
+
+   ```bash
+   npm run check:deploy
+   ```
+
+   It confirms the secrets are the right shape, connects to the database, says
+   whether the schema and the owner account are there, and writes, reads back
+   and deletes one test file in the storage bucket — because the only honest
+   test of an upload is an upload. Anything wrong is named, with the command
+   that fixes it. Nothing is printed that would leak a secret.
+
+6. **Deploy**, then sign in and change the owner password immediately.
 
 ### What "free" actually costs you
 

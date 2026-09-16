@@ -21,7 +21,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "verify": "npm run typecheck && npm run lint && npm run test",
-    "e2e:server": "bash scripts/dev/e2e-server.sh"
+    "e2e:server": "bash scripts/dev/e2e-server.sh",
+    "check:deploy": "tsx scripts/check-deploy.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",

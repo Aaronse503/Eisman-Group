@@ -143,6 +143,7 @@ npm run lint           # ESLint
 npm run test           # unit and integration tests, every workspace
 npm run test:e2e       # end-to-end tests
 npm run verify         # typecheck, lint and test together
+npm run check:deploy   # check a deployment's configuration before deploying
 ```
 
 The embedded database allows one process at a time, so stop the dev server
